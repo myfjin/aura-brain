@@ -78,6 +78,8 @@ jobs:
           python -m pip install -e ".[dev]"
 
       - name: Run pytest with coverage
+        env:
+          PYTHONHASHSEED: "0"
         run: pytest --cov=aura_brain --cov-report=xml --cov-report=term-missing
 
       # Coverage upload is opt-in — enable when a codecov token is added

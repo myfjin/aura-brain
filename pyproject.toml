@@ -112,11 +112,8 @@ addopts = [
   "--strict-markers",
   "--strict-config",
 ]
-# The calibration-path convention from CONTRIBUTING.md — deterministic tests
-# assume sorted() over sets; property tests may vary the hash seed.
-env = [
-  "PYTHONHASHSEED=0",
-]
+# PYTHONHASHSEED is set in the CI step, not here — pytest's `env` config
+# needs the pytest-env plugin, which is not a dependency we want yet.
 
 [tool.coverage.run]
 source = ["src/aura_brain"]
