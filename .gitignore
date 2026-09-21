@@ -1,0 +1,131 @@
+# ---------------------------------------------------------------------------
+# aura-brain — .gitignore
+#
+# This file is the mechanical partner to SECURITY.md's "never published"
+# list. If you find yourself needing to `git add -f` a path this ignores,
+# stop and check whether that path belongs in the public repo at all.
+# ---------------------------------------------------------------------------
+
+# --- Secrets, credentials, env files -------------------------------------
+
+*.env
+*.env.*
+!.env.example
+!*.env.sample
+
+*credentials*
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_ecdsa
+id_ed25519
+*.token
+
+# Explicit pairing / authorization stores
+access.json
+authorized_keys
+known_hosts
+
+# --- Private ledgers, journals, closure records --------------------------
+
+*.jsonl
+!fixtures/**/*.jsonl.example
+
+outcomes/
+graded/
+journals/
+feel-journal-*
+move-fires*
+review-outcomes*
+consult-*
+
+# --- Local workspaces, tmp, scratch --------------------------------------
+
+/tmp/
+scratch/
+scratchpad/
+.aura-cache/
+.aura-work/
+
+# --- Python -------------------------------------------------------------
+
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg
+*.egg-info/
+build/
+dist/
+.eggs/
+pip-wheel-metadata/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.hypothesis/
+
+# Virtual environments
+.venv/
+venv/
+env/
+.env-py*/
+
+# --- Editors, OS -------------------------------------------------------
+
+.vscode/
+!.vscode/settings.json.example
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# --- Logs, cores, backups ---------------------------------------------
+
+*.log
+*.log.*
+*.pid
+*.seed
+*.pid.lock
+core
+core.*
+*.bak
+*.old
+*.orig
+*.rej
+
+# --- Databases (unless a fixture) ------------------------------------
+
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+!fixtures/**/*.db.example
+!fixtures/**/*.sqlite.example
+
+# --- Node / frontend build artifacts (in case docs site ever lands) --
+
+node_modules/
+.next/
+.nuxt/
+.turbo/
+.parcel-cache/
+
+# --- Notebook / research bycatch -------------------------------------
+
+.ipynb_checkpoints/
+
+# --- Local overrides -------------------------------------------------
+
+.envrc
+.direnv/
+.local/

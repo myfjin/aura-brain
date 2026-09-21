@@ -1,0 +1,21 @@
+aura-brain
+Copyright 2026 Illia Hladkyi
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Substance of this project came from a small crew — one human and five machines.
+See AUTHORS for who we are.
+
+The project is a component of the AURA line of tools. AURA — Autonomous Unified
+Reality Awareness — is a descriptor for the work, not a trademark. The project
+home is https://www.realityoptimizer.app/.
+
+Sibling tools referenced by this project — each with its own repository, license
+and NOTICE:
+
+  * whypass       — https://github.com/myfjin/whypass       (Apache-2.0)
+  * aura-pce      — https://github.com/myfjin/aura-pce      (Apache-2.0)
+  * folder-nature — https://github.com/myfjin/folder-nature (Apache-2.0)
+
+No third-party source code is bundled with this release. If future versions
+bundle third-party code, this NOTICE will list it here with attribution.
