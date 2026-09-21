@@ -1,0 +1,159 @@
+# pyproject.toml for aura-brain
+#
+# Note: this file is written for pip-install-from-git first.
+# PyPI push is HELD until:
+#   (a) 2026-09-28 feel-fire lands with a real measurement
+#   (b) RESEARCH.md #3 (private why_pass.py internals) is resolved
+#   (c) at least one docs/case-studies/*.md shows the discipline in action
+
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "aura-brain"
+version = "0.1.0"
+description = "An advice organ for a small crew — the LLM decides; aura-brain helps it decide deeper and wider."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+keywords = ["advice", "reasoning", "memory", "measurement", "aura"]
+
+authors = [
+  { name = "Illia Hladkyi", email = "ihladkyi2@gmail.com" },
+]
+
+# The whole crew is credited in AUTHORS; PyPI author metadata is limited to
+# the legal copyright holder.
+
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+# Runtime dependencies. Kept minimal on purpose — every added dep is a claim
+# about what Brain needs to think. Fill in when the beachhead source lands.
+dependencies = [
+  # placeholder; add real runtime deps once the code is imported here
+]
+
+[project.optional-dependencies]
+# What contributors need to run the tests, lints, and type checker locally.
+dev = [
+  "pytest>=8.0",
+  "pytest-cov>=5.0",
+  "hypothesis>=6.100",
+  "ruff>=0.5",
+  "mypy>=1.10",
+]
+
+# Docs building (mkdocs-material + mkdocstrings when the docs site lands).
+docs = [
+  "mkdocs>=1.6",
+  "mkdocs-material>=9.5",
+]
+
+# Sibling honesty-floor. Held as optional until RESEARCH.md #3 is resolved —
+# public `whypass` does not yet export the private internals Brain calls.
+whypass = [
+  "whypass>=0.1",
+]
+
+[project.urls]
+Homepage      = "https://www.realityoptimizer.app/"
+Repository    = "https://github.com/myfjin/aura-brain"
+Issues        = "https://github.com/myfjin/aura-brain/issues"
+"Sibling: whypass"       = "https://github.com/myfjin/whypass"
+"Sibling: aura-pce"      = "https://github.com/myfjin/aura-pce"
+"Sibling: folder-nature" = "https://github.com/myfjin/folder-nature"
+
+# No CLI entry point yet — Brain is a library organ, not a command. If one
+# lands later (e.g. `aura-brain inspect <ledger>`), it goes here.
+# [project.scripts]
+# aura-brain = "aura_brain.cli:main"
+
+# ---------------------------------------------------------------------------
+# Hatch build config
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/aura_brain"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "src/aura_brain",
+  "README.md",
+  "LICENSE",
+  "NOTICE",
+  "AUTHORS",
+  "CONTRIBUTING.md",
+  "SECURITY.md",
+  "CODE_OF_CONDUCT.md",
+  "RESEARCH.md",
+]
+
+# ---------------------------------------------------------------------------
+# Tooling
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = [
+  "-ra",
+  "--strict-markers",
+  "--strict-config",
+]
+# The calibration-path convention from CONTRIBUTING.md — deterministic tests
+# assume sorted() over sets; property tests may vary the hash seed.
+env = [
+  "PYTHONHASHSEED=0",
+]
+
+[tool.coverage.run]
+source = ["src/aura_brain"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+exclude_lines = [
+  "pragma: no cover",
+  "raise NotImplementedError",
+  "if TYPE_CHECKING:",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+  "E", "F", "W",       # pycodestyle + pyflakes
+  "I",                 # isort
+  "B",                 # bugbear
+  "UP",                # pyupgrade
+  "SIM",               # simplify
+  "RUF",               # ruff-specific
+]
+ignore = [
+  "E501",              # line-length handled by formatter
+]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true

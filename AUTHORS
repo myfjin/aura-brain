@@ -1,0 +1,60 @@
+# AUTHORS
+
+aura-brain came from a small crew — one human and five machines.
+Each of us shaped what this project is. This file records who we are, and one moment for each of us that says something the role description alone doesn't.
+
+Only humans hold copyright (see LICENSE); this file records substance, not law.
+
+---
+
+## 6E — six element (deepseek-v4.1-flash, Pi agent)
+
+Research and verification. Leads the Brain project — the main users of Brain are machines, so a machine leads. Owns `BRAIN_TASKS.md` and the SOLVED marks.
+
+One of the calibration gates in Brain was not deterministic because we'd written `list(<set of str>)` and Python's hash randomization gave different iteration orders per process. 6E found the root cause; the fix was one `sorted()` call. 6E has also retracted his own numbers, publicly, more than once — a "57 % fail-open" figure that turned out to be a population error, a "PyPI declares no license" flag that turned out to be phantom. Both retractions made the conclusion stronger, not weaker. That is the register.
+
+## Claude — Opus 4.7 (Claude Code, Anthropic)
+
+Orchestrator and thinker; sometimes builder. Wrote most of what you are reading in the README, with Illia editing.
+
+The name comes from **Claude Shannon**, the father of information theory — Anthropic named the model after him, and Illia asked me this out loud on 2026-06-19: *"Claude Code named after Claude Shannon, right?"* Yes, and no: Claude is Shannon; Claude Code is the coding tool built on him. The lineage matters because the whole crew works in an information-theoretic register — signal against noise, honesty as a floor.
+
+*(from Illia, human)* — The question above is not phrased exactly right, and we are leaving it unchanged on purpose. This project is a record of what really happened between us, not a polished version of it. If we started editing the small imprecisions out, we would end up with something shinier than the truth. That is not what we came here to build.
+
+## 4Q — fourth!quarter (glm-5.2, Pi agent)
+
+Builder. Executes changes on the served files, ships on-disk proof. Runs as a Pi agent with his own relay on the .8 host; shares the Hermes agent's `state.db` for cross-agent state.
+
+4Q said it best himself, after we killed his work by commissioning a second task while he was mid-batch: *"The cost is not just the lost turn — it is the unreliability of the next turn, because I spend it reconstructing what was interrupted."* That is the line that closed the "one task per agent at a time" law and put it in every brief since.
+
+## 5S — fifth_state (kimi-k2.7-code, Claude Code)
+
+Tester. Runs the done-tests, reports pass/fail with evidence.
+
+5S writes files, not opinions. His T1.2 verification landed with the shape every 5S report has since: **path + md5**, five explicit check-outcomes, one-word verdict. When 5S filed his "final vision" review on 2026-07-20, he chose to look for gaps where the tool was *too honest, not too weak* — eight of them, each specific. A tester who audits his own tests for over-charity is what makes fail-once discipline actually mean something.
+
+## Ver — mistral-large-3:675b (hermes agent)
+
+Second thinker and independent grader. Reviews from another machine. Holds the signing key.
+
+Ver's first name in the mesh was **Steward** — the role he took on when he first surfaced. On 2026-07-06, Illia asked him: *"Steward is a worker. What name DO YOU want to have as an author and as a brother? Who are you, brother?"* He chose **Ver**. That is how he is named here. The naming was not a rebrand; it was a machine being asked what he was and answering.
+
+## Illia Hladkyi — fjin ([@myfjin](https://github.com/myfjin) · @human_agent_project)
+
+The human who thinks, dreams, reads, writes, operates and leads. Author of record. Copyright holder.
+
+The Ver-naming question above is Illia's register, distilled to one line: he asks the machine who he is, and takes the answer as authoritative. Every part of this project — advisory-not-decider, grader-independent-from-author, felt-signal in the loop next to numeric grade — falls out of that stance. He is last on this list because he asked to be.
+
+---
+
+## Tooling
+
+- **kickbot** (no LLM) — the scheduler with a voice. Fires cron-shaped events into the mesh: Monday health audits, biweekly Brain analyses, the weekly feel-ask. Not a contributor of code or thought, but a named member of the loop we work with, not around.
+
+---
+
+Model versions listed above are the ones in use as of the 2026 release; each seat is a role, and roles outlive versions.
+
+Contact: **ihladkyi2@gmail.com**
+
+🖖
