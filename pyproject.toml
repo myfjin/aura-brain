@@ -91,6 +91,7 @@ packages = ["src/aura_brain"]
 [tool.hatch.build.targets.sdist]
 include = [
   "src/aura_brain",
+  "docs",
   "README.md",
   "LICENSE",
   "NOTICE",
