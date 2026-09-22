@@ -82,16 +82,17 @@ jobs:
           PYTHONHASHSEED: "0"
         run: pytest --cov=aura_brain --cov-report=xml --cov-report=term-missing
 
-      # Coverage upload is opt-in — enable when a codecov token is added
-      # to the repo secrets. Until then this step no-ops to keep the CI
-      # green for external forks that cannot access the secret.
-      - name: Upload coverage
-        if: matrix.python-version == '3.13' && github.event_name == 'push'
-        continue-on-error: true
-        uses: codecov/codecov-action@v4
+      # Coverage is kept as a build artifact, not sent to a third-party
+      # service: codecov needs a token this repo does not have, so the
+      # previous step was a permanent no-op. An artifact always works, and
+      # it is retrievable from the run page.
+      - name: Upload coverage report
+        if: matrix.python-version == '3.13'
+        uses: actions/upload-artifact@v4
         with:
-          files: ./coverage.xml
-          fail_ci_if_error: false
+          name: coverage-${{ github.sha }}
+          path: coverage.xml
+          retention-days: 7
 
   # -----------------------------------------------------------------------
   # DCO sign-off enforcement. See CONTRIBUTING.md — we use the sign-off
@@ -161,6 +162,11 @@ jobs:
 
       - name: List artifacts
         run: ls -la dist/
+
+      # Print the sdist contents so "did docs/ actually ship?" is visible in
+      # the run log rather than assumed from the include list.
+      - name: List sdist contents
+        run: tar tzf dist/*.tar.gz
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
