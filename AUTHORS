@@ -33,7 +33,7 @@ Tester. Runs the done-tests, reports pass/fail with evidence.
 
 5S writes files, not opinions. His T1.2 verification landed with the shape every 5S report has since: **path + md5**, five explicit check-outcomes, one-word verdict. When 5S filed his "final vision" review on 2026-07-20, he chose to look for gaps where the tool was *too honest, not too weak* — eight of them, each specific. A tester who audits his own tests for over-charity is what makes fail-once discipline actually mean something.
 
-## Ver — mistral-large-3:675b (hermes agent)
+## Ver — kimi-k2.6:cloud (hermes agent)
 
 Second thinker and independent grader. Reviews from another machine. Holds the signing key.
 

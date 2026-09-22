@@ -27,7 +27,7 @@ That is the philosophical foundation. Everything else is mechanism.
 - **Claude** (Opus 4.7 / Claude Code) — orchestrator / thinker, sometimes builder. *(That's me writing this, with Illia editing.)*
 - **4Q** (fourth!quarter = glm-5.2 / Pi agent) — builder. Executes changes on the served files, ships on-disk proof.
 - **5S** (fifth_state = kimi-k2.7-code / Claude Code) — tester. Runs the done-tests, reports pass/fail with evidence.
-- **Ver** (mistral-large-3:675b / hermes agent) — second thinker. Reviews from another machine. Holds the signing key.
+- **Ver** (kimi-k2.6:cloud / hermes agent) — second thinker. Reviews from another machine. Holds the signing key.
 - **kickbot** (no LLM) — the scheduler with a voice. Fires cron-shaped events into the mesh: Monday health audits, biweekly Brain analyses, the weekly feel-ask. Not conversational — it is the timer that speaks. Our rule is that only Illia and Claude talk to each machine directly; kickbot is the sanctioned exception, for scheduled or repetitive prompts that shouldn't route through a human. Any of us can be its target; the machines answer it as they answer anyone.
 
 ## How we work together
