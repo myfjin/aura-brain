@@ -121,11 +121,15 @@ jobs:
           merge_base=$(git merge-base "$base" "$head")
           fail=0
           for sha in $(git rev-list "$merge_base..$head"); do
+            name=$(git log -1 --format='%an' "$sha")
             email=$(git log -1 --format='%ae' "$sha")
-            if git log -1 --format='%B' "$sha" | grep -qiE "^Signed-off-by: .*<${email}>[[:space:]]*$"; then
+            expected="Signed-off-by: ${name} <${email}>"
+            # fixed-string match: the author email can contain regex metacharacters
+            # (e.g. the '+' in a GitHub noreply address), so -F, not an ERE.
+            if git log -1 --format='%B' "$sha" | sed 's/[[:space:]]*$//' | grep -qixF "$expected"; then
               echo "OK    $sha  ($email)"
             else
-              echo "::error::commit $sha is missing a Signed-off-by matching its author <$email>"
+              echo "::error::commit $sha is missing '${expected}'"
               fail=1
             fi
           done
