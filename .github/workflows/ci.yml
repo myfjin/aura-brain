@@ -97,16 +97,43 @@ jobs:
   # DCO sign-off enforcement. See CONTRIBUTING.md — we use the sign-off
   # only; there is no CLA. Every commit in a PR must carry a
   # `Signed-off-by:` trailer matching the commit author.
+  #
+  # Implemented inline, with no third-party action: the one we used before
+  # (tim-actions/dco@v1.1.0) declares `using: node12`, and GitHub has retired
+  # that runtime, so it failed silently. Because this job is a REQUIRED check,
+  # that failure blocked every pull request. This step is the same rule with no
+  # runtime to retire.
   # -----------------------------------------------------------------------
   dco:
     name: DCO check
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - name: Check sign-off
-        uses: tim-actions/dco@v1.1.0
+      - uses: actions/checkout@v4
         with:
-          commits: ${{ github.event.pull_request.commits }}
+          fetch-depth: 0
+
+      - name: Verify Signed-off-by on every PR commit
+        run: |
+          set -u
+          base="${{ github.event.pull_request.base.sha }}"
+          head="${{ github.event.pull_request.head.sha }}"
+          merge_base=$(git merge-base "$base" "$head")
+          fail=0
+          for sha in $(git rev-list "$merge_base..$head"); do
+            name=$(git log -1 --format='%an' "$sha")
+            email=$(git log -1 --format='%ae' "$sha")
+            expected="Signed-off-by: ${name} <${email}>"
+            # fixed-string match: the author email can contain regex metacharacters
+            # (e.g. the '+' in a GitHub noreply address), so -F, not an ERE.
+            if git log -1 --format='%B' "$sha" | sed 's/[[:space:]]*$//' | grep -qixF "$expected"; then
+              echo "OK    $sha  ($email)"
+            else
+              echo "::error::commit $sha is missing '${expected}'"
+              fail=1
+            fi
+          done
+          exit $fail
 
   # -----------------------------------------------------------------------
   # Build check. Confirms the wheel and sdist actually assemble, so a
