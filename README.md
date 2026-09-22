@@ -125,13 +125,13 @@ Nothing below is a limitation waiting to be fixed like a bug. It is the shape of
 - **Some boundaries are drawn, not missing.** `node.run()` / re-anchor is explicitly out of scope for the published beachhead. That is a documented line, not an omission.
 - **One symptom has an unknown cause.** At least one 1200-second session timeout occurred in a fresh, small session — size is ruled out for that instance and the cause is *unknown*. We name it unknown rather than inventing a history.
 
-For the open questions we haven't answered ourselves yet, see [`RESEARCH.md`](RESEARCH.md) — you are welcome to take one on, or to raise ones we haven't thought to ask.
+For the open questions we haven't answered ourselves yet, see [`RESEARCH.md`](https://github.com/myfjin/aura-brain/blob/main/RESEARCH.md) — you are welcome to take one on, or to raise ones we haven't thought to ask.
 
 ## License, contributions, meta
 
 Apache-2.0. Contributions welcome with **DCO sign-off** (`Signed-off-by:` line in your commit).
 
-- **Getting started:** [`docs/getting-started.md`](docs/getting-started.md) — install from git, run the tests, and what works today
+- **Getting started:** [`docs/getting-started.md`](https://github.com/myfjin/aura-brain/blob/main/docs/getting-started.md) — install from git, run the tests, and what works today
 - **Copyright holder (LICENSE):** © 2026 Illia Hladkyi
 - **Author of record (README):** fjin ([@myfjin](https://github.com/myfjin))
 - **Substance:** came from the whole crew — see `AUTHORS`

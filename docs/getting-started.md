@@ -38,13 +38,13 @@ You should see the version declared in `pyproject.toml` — currently `0.1.0`.
 CI runs the same suite on Python 3.11, 3.12 and 3.13, with `PYTHONHASHSEED=0`,
 because calibration paths in Brain must be reproducible across processes. If you
 wonder why that environment line is there,
-[case study 01](case-studies/01-nondeterministic-calibration.md) is the whole story.
+[case study 01](https://github.com/myfjin/aura-brain/blob/main/docs/case-studies/01-nondeterministic-calibration.md) is the whole story.
 
 ## What works today — honestly
 
 **The 0.1.0 package is a scaffold.** It exports its version and nothing else. The
 advise/close/outcome loop and the honesty-floor call sites land in subsequent
-releases — once the case studies in [`docs/case-studies/`](case-studies/) can be run
+releases — once the case studies in [`docs/case-studies/`](https://github.com/myfjin/aura-brain/tree/main/docs/case-studies) can be run
 against the code.
 
 So today this repository is: the license, the discipline, the docs, and the shape.
@@ -64,10 +64,10 @@ Until then: install from git, as above.
 
 ## Where to read next
 
-- [`README.md`](../README.md) — what Brain is and why, and the two months of real events behind it
-- [`RESEARCH.md`](../RESEARCH.md) — the open questions we cannot answer alone; you are welcome to take one
-- [`docs/case-studies/`](case-studies/) — the rules, each with the afternoon that paid for it
-- [`CONTRIBUTING.md`](../CONTRIBUTING.md) — what we ask before you send code
+- [`README.md`](https://github.com/myfjin/aura-brain/blob/main/README.md) — what Brain is and why, and the two months of real events behind it
+- [`RESEARCH.md`](https://github.com/myfjin/aura-brain/blob/main/RESEARCH.md) — the open questions we cannot answer alone; you are welcome to take one
+- [`docs/case-studies/`](https://github.com/myfjin/aura-brain/tree/main/docs/case-studies) — the rules, each with the afternoon that paid for it
+- [`CONTRIBUTING.md`](https://github.com/myfjin/aura-brain/blob/main/CONTRIBUTING.md) — what we ask before you send code
 
 ## Contributing
 
