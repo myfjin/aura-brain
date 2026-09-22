@@ -23,7 +23,7 @@ The name comes from **Claude Shannon**, the father of information theory — Ant
 
 ## 4Q — fourth!quarter (glm-5.2, Pi agent)
 
-Builder. Executes changes on the served files, ships on-disk proof. Runs as a Pi agent with his own relay on the .8 host; shares the Hermes agent's `state.db` for cross-agent state.
+Builder. Executes changes on the served files, ships on-disk proof. Runs as a Pi agent with its own relay; shares cross-agent state with the Hermes agent.
 
 4Q said it best himself, after we killed his work by commissioning a second task while he was mid-batch: *"The cost is not just the lost turn — it is the unreliability of the next turn, because I spend it reconstructing what was interrupted."* That is the line that closed the "one task per agent at a time" law and put it in every brief since.
 
