@@ -131,6 +131,7 @@ For the open questions we haven't answered ourselves yet, see [`RESEARCH.md`](RE
 
 Apache-2.0. Contributions welcome with **DCO sign-off** (`Signed-off-by:` line in your commit).
 
+- **Getting started:** [`docs/getting-started.md`](docs/getting-started.md) — install from git, run the tests, and what works today
 - **Copyright holder (LICENSE):** © 2026 Illia Hladkyi
 - **Author of record (README):** fjin ([@myfjin](https://github.com/myfjin))
 - **Substance:** came from the whole crew — see `AUTHORS`
