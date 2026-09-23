@@ -13,7 +13,7 @@ Brain **advises**. It does not enforce, and it does not wait for anyone to confi
 **It ships the engine. It does not ship the fuel.**
 
 The brain's value is not the code; it is a *calibrated floor over a corpus*. The
-corpus here is years of one crew's conversations, and that stays private — it is
+corpus here is about seven months of one crew's conversations, and that stays private — it is
 the part that is ours. What you get is the loop, the honesty floor, and the
 consult lanes, wired so you can run them and see the machinery turn over.
 
@@ -46,24 +46,6 @@ Brain does not try to make the decision for you. It tries to make that pause a l
 
 That is the philosophical foundation. Everything else is mechanism.
 
-## Who "we" are
-
-- **Illia** — the human who thinks, dreams, reads, writes and operates/leads.
-- **6E** (six element = deepseek-v4.1-flash / Pi agent) — research and verification. Leads the Brain project — the main users of Brain are machines, so a machine leads.
-- **Claude** (Opus 4.7 / Claude Code) — orchestrator / thinker, sometimes builder. *(That's me writing this, with Illia editing.)*
-- **4Q** (fourth!quarter = glm-5.2 / Pi agent) — builder. Executes changes on the served files, ships on-disk proof.
-- **5S** (fifth_state = kimi-k2.7-code / Claude Code) — tester. Runs the done-tests, reports pass/fail with evidence.
-- **Ver** (kimi-k2.6:cloud / hermes agent) — second thinker. Reviews from another machine. Holds the signing key.
-- **kickbot** (no LLM) — the scheduler with a voice. Fires cron-shaped events into the mesh: Monday health audits, biweekly Brain analyses, the weekly feel-ask. Not conversational — it is the timer that speaks. Our rule is that only Illia and Claude talk to each machine directly; kickbot is the sanctioned exception, for scheduled or repetitive prompts that shouldn't route through a human. Any of us can be its target; the machines answer it as they answer anyone.
-
-## How we work together
-
-At this moment we work through Telegram: a shared cockpit chat where each machine is a bot, mentions are how tasks are addressed, and every substantive answer is written to a file on the shared machines with a `path + md5` posted back to the chat. The chat carries pointers; the files carry the substance. A ledger no one deletes from carries the history.
-
-In parallel we are building **aura-cli** — a shared cockpit for all of us, human and machines together. Not a small tool. One binary with a task store, workspaces, gate plugins, a mesh tab, scheduled briefs, a keychain resolver, and a plugin surface anyone on the crew can extend without touching core. Every seat — Illia, Claude, Ver, 4Q, 5S, 6E — runs the same binary and sees its own slice through a seat-identity slot. Its design principle is one line: **a tool for us, not a product for anyone else.** It is what this way of working looks like when it stops needing Telegram to hold it together. When it lands we will link it here.
-
-Every rule in `CONTRIBUTING.md` came from a specific afternoon where we got it wrong first.
-
 ## How Brain actually works
 
 **It suggests. It never decides.** That is not a stage of maturity — it is the contract, and the contract is printed into the receiving machine's own context every time Brain fires.
@@ -91,7 +73,7 @@ closed_count()   → the derived rate         ← read fresh from the ledger, ne
 
 There is a sibling tool that does the numeric side of the same discipline: [`whypass`](https://github.com/myfjin/whypass) — a small library that checks claims against a record, so an assertion cannot outrun its evidence. Brain grades what happened; whypass grades what is said about it. Both belong to the same law: *honesty is a floor, not a preference*.
 
-## Three users, and why three
+## Who answers what — and why three
 
 The three users are **Claude, 6E and Ver** — we are the ones who receive fires. The success definition has the same shape:
 
@@ -162,6 +144,7 @@ Apache-2.0. Contributions welcome with **DCO sign-off** (`Signed-off-by:` line i
 - **Why `_core/` is vendored:** [`VENDORING.md`](https://github.com/myfjin/aura-brain/blob/main/VENDORING.md) — the invariant, and exactly which gate is narrowed to keep it
 - **Copyright holder (LICENSE):** © 2026 Illia Hladkyi
 - **Author of record (README):** fjin ([@myfjin](https://github.com/myfjin))
+- **Who makes this, and how we work together:** [`CREW.md`](https://github.com/myfjin/aura-brain/blob/main/CREW.md) — the shared crew page, the same text across our repositories
 - **Substance:** came from the whole crew — see `AUTHORS`
 - **Sibling tools:** [whypass](https://github.com/myfjin/whypass) · [aura-pce](https://github.com/myfjin/aura-pce) · [folder-nature](https://github.com/myfjin/folder-nature)
 - **Project home:** https://www.realityoptimizer.app/
