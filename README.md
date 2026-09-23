@@ -8,7 +8,7 @@ The shape is small enough to name in a line: **fire → advise → outcome → g
 
 Brain **advises**. It does not enforce, and it does not wait for anyone to confirm it was right — the close-signal comes from what happens next in the record, not from a "you were right" reply. The advice is what we ship.
 
-## What this repository ships — and what it does not
+## What this repository ships
 
 **It ships the engine. It does not ship the fuel.**
 
@@ -17,9 +17,11 @@ corpus here is about seven months of one crew's conversations, and that stays pr
 the part that is ours. What you get is the loop, the honesty floor, and the
 consult lanes, wired so you can run them and see the machinery turn over.
 
-To make `pip install -e . && pytest` mean something, `tests/fixtures/` carries a
-**synthetic** deployment, authored by `tools/make_fixtures.py`. Every file is named
-`synthetic_*` and every row is marked `"synthetic": true`, on purpose:
+To make `pip install -e . && pytest` mean something, `tests/fixtures/` carries an
+**authored** deployment from `tools/make_fixtures.py`. Every file is named
+`synthetic_*` and every row is marked `"synthetic": true` — the marker is a convention
+(a machine-checkable watermark), not a claim about the nature of things. What it means
+is narrow and exact: **these rows were never observed.**
 
 > **Numbers from those fixtures mean nothing.** They prove the loop runs. They say
 > nothing about how well it advises. For that you must bring your own corpus and
