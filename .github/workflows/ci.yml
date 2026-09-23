@@ -159,7 +159,12 @@ jobs:
           set -euo pipefail
           # Embedding caches are derived DATA: ds_keys_cache.npz once carried 374
           # vectors computed from a real registry. That is a leak, not noise.
-          hits=$(git ls-files | grep -E '\.(npz|npy|jsonl|db|sqlite|sqlite3)$' || true)
+          # The authored synthetic fixtures ARE tracked on purpose — they are named
+          # synthetic_* and they are the only data allowed in. Anything else is
+          # derived. (A green local run once hid this: .gitignore excluded the
+          # fixtures, the tests passed on disk, and CI failed without them.)
+          hits=$(git ls-files | grep -E '\.(npz|npy|jsonl|db|sqlite|sqlite3)$' \
+                 | grep -vE '^tests/fixtures/synthetic_[^/]*\.(jsonl|db)$' || true)
           if [ -n "$hits" ]; then
             echo "$hits"
             echo "::error::derived data is tracked — embedding caches encode registry content"
