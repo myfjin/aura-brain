@@ -73,5 +73,12 @@ def test_negative_control_reports_not_fired_without_an_error() -> None:
     assert consult, "no lanes reported at all"
     errored = {name: v.get("error") for name, v in consult.items() if v.get("error")}
     assert not errored, f"lane(s) errored on a null input instead of not firing: {errored}"
+    # A lane may legitimately be SKIPPED: the embedder is an optional extra, and its
+    # absence is a documented condition, not a defect. What must never happen is an
+    # absent dependency surfacing as `error` — that is indistinguishable from a dead
+    # lane, which is how a real defect hid. If a lane is skipped it must say why.
+    for name, v in consult.items():
+        if "skipped" in v:
+            assert v["skipped"], f"lane {name!r} skipped without saying why"
     fired = [name for name, v in consult.items() if v.get("fired")]
     assert not fired, f"null input fired {fired} — either the fixture is rigged or a lane is greedy"
