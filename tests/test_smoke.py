@@ -14,6 +14,8 @@ def test_version_is_pep440_style() -> None:
     assert re.fullmatch(r"\d+\.\d+\.\d+", aura_brain.__version__), aura_brain.__version__
 
 
-def test_package_exports_version_only() -> None:
-    """0.1.0 is a scaffold; __all__ must be minimal and match __version__."""
-    assert aura_brain.__all__ == ["__version__"]
+def test_package_exports_the_public_loop() -> None:
+    """The package exposes the loop, not its internals."""
+    assert set(aura_brain.__all__) == {"__version__", "advise", "record_outcome"}
+    assert callable(aura_brain.advise)
+    assert callable(aura_brain.record_outcome)
