@@ -12,7 +12,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "aura-brain"
-version = "0.1.0"
+version = "0.2.0"
 description = "An advice organ for a small crew — the LLM decides; aura-brain helps it decide deeper and wider."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -44,7 +44,19 @@ classifiers = [
 # Runtime dependencies. Kept minimal on purpose — every added dep is a claim
 # about what Brain needs to think. Fill in when the beachhead source lands.
 dependencies = [
-  # placeholder; add real runtime deps once the code is imported here
+  # The MCP server SDK. brain_mcp declares its four tools at module level
+  # (`mcp = FastMCP(...)` + `@mcp.tool()`), so importing the loop imports it —
+  # even if you only ever call advise(). Undeclared, a clean install failed with
+  # "No module named 'mcp'" while every developer machine had it already.
+  #
+  # PINNED BELOW 2: mcp 2.x renamed FastMCP to MCPServer and changed the decorator
+  # API. The vendored core is written against v1. Unpinned, every new install got
+  # 2.x and the loop would not import at all — which is what CI caught. Migrating
+  # to the v2 API is a tracked follow-up, not a silent break.
+  "mcp>=1.0,<2",
+  # The consult lanes do their vector maths with numpy (imported at call time,
+  # required at call time). Declared here rather than left to a chance install.
+  "numpy>=1.26",
 ]
 
 [project.optional-dependencies]
@@ -73,8 +85,13 @@ math = [
   "sympy>=1.12",
 ]
 
+# The distillation / floor path calls a model. It needs a key, so it is opt-in.
+distill = [
+  "anthropic>=0.30",
+]
+
 everything = [
-  "aura-brain[embeddings,math]",
+  "aura-brain[embeddings,math,distill]",
 ]
 
 # Docs building (mkdocs-material + mkdocstrings when the docs site lands).
