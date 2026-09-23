@@ -1,7 +1,7 @@
-"""Smoke tests for the aura-brain scaffold.
+"""Smoke tests for the package surface.
 
-These land here so CI has something honest to run against the 0.1.0
-scaffold. They will grow as the beachhead source lands.
+The loop itself is covered in ``test_loop.py``. These tests only pin what the
+package exposes and how it names itself — the surface a user meets first.
 """
 
 import re
