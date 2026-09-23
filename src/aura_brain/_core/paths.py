@@ -65,6 +65,11 @@ ENV_FILE: Path = _env_path("AURA_ENV_FILE", BRAIN_HOME / ".env")
 BRAIN_OUT: Path = _env_path("BRAIN_OUT", BRAIN_HOME / "brain_concepts.json")
 LAB_ROOT: Path = _env_path("LAB_ROOT", BRAIN_HOME)
 
+# ── offline corpora (the gate/generator path only — never the advice loop) ───
+PERSONA_TXT: Path = _env_path("AURA_PERSONA_TXT", BRAIN_HOME / "persona.txt")
+TG_EXPORT: Path = _env_path("AURA_TG_EXPORT", BRAIN_HOME / "tgexport" / "result.json")
+MOVE_SPACES: Path = _env_path("AURA_MOVE_SPACES", BRAIN_HOME / "move-spaces")
+
 
 def describe() -> str:
     """One-line summary for logs and bug reports. Never includes credentials."""
