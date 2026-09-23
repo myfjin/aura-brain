@@ -118,12 +118,35 @@ def _keys_matrix(pats):
     return K, np.array(owner)
 
 
+def _embedder_available() -> bool:
+    """Is the embeddings extra installed?
+
+    The embedder ships as an optional dependency (chromadb's local MiniLM — no API
+    key, no network). Absent, no lane can match anything. That is a documented
+    condition, NOT a broken lane — so every embedding call site checks here first
+    and fails OPEN with a loud line, rather than raising something that surfaces as
+    a lane `error` indistinguishable from a real defect.
+    """
+    try:
+        # Test the import that will actually be used. `find_spec` would answer
+        # "findable", which is not the same as "importable" — a broken or partial
+        # install passes find_spec and then fails at the call.
+        import chromadb.utils.embedding_functions  # noqa: F401
+    except Exception:
+        return False
+    return True
+
+
 def _fire(text: str, top: int = 3):
     """Core recognition: embed only the NEW situation, dot it against the cached
     library key-matrix (max over each move's examples). Shared by coverage(), recall(),
     and _recognize_moves. Returns None if no move library yet."""
     import numpy as np
     if not (PATTERNS.exists() and PATTERNS.read_text().strip()):
+        return None
+    if not _embedder_available():
+        print("[recognition] embedder unavailable (pip install aura-brain[embeddings])"
+              " — recall off (fail-open)", file=sys.stderr)
         return None
     pats = [json.loads(l) for l in PATTERNS.read_text().splitlines() if l.strip()]
     # T4.2 suppression: entries marked {"suppressed": true} (pruned moves) do not load,

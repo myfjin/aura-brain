@@ -29,6 +29,8 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import paths  # published settings module (see VENDORING.md)
+
 from constraint_filter import checkable_exprs  # noqa: E402  pure-stdlib, safe at import
 import node       # noqa: E402
 import outcomes   # noqa: E402  the earned-confidence ledger (recognition + review tracks)
@@ -83,6 +85,12 @@ def advise(situation: str, recent_actions: list | None = None, caller: str = "")
                     "belief": L.detail.get("belief", ""),
                 })
             consult[lname] = entry
+        except ImportError as e:
+            # An OPTIONAL dependency that is not installed (chromadb, sympy) is a
+            # documented condition, not a broken lane. Reporting it as `error` makes
+            # it indistinguishable from a dead lane — which is how a real defect hid
+            # (an empty registry raised ValueError and read as "the lane is broken").
+            consult[lname] = {"fired": False, "skipped": f"optional dependency absent: {e}"}
         except Exception as e:  # a broken lane must not sink advise
             consult[lname] = {"fired": False, "error": f"{type(e).__name__}: {e}"}
 
@@ -103,6 +111,8 @@ def advise(situation: str, recent_actions: list | None = None, caller: str = "")
             apt = {"score": rep.score, "verdict": rep.verdict, "hard_fail": rep.hard_fail,
                    "checks": [{"name": c.name, "applicable": c.applicable,
                                "passed": c.passed, "detail": c.detail} for c in rep.checks]}
+        except ImportError as e:  # optional dependency absent — documented, not a defect
+            aptness = {"skipped": f"optional dependency absent: {e}"}
         except Exception as e:  # aptness must never break advise
             apt = {"error": f"{type(e).__name__}: {e}"}
 
@@ -122,6 +132,8 @@ def advise(situation: str, recent_actions: list | None = None, caller: str = "")
                       "move_coherent": mine.get("cross") is False,
                       "note": mine.get("note", ""),
                       "suggest_instead": ranked[0]["move"] if swapped else None}
+        except ImportError as e:  # optional dependency absent — documented, not a defect
+            domain = {"skipped": f"optional dependency absent: {e}"}
         except Exception as e:  # citizenship must never break advise
             domain = {"error": f"{type(e).__name__}: {e}"}
 
