@@ -70,5 +70,12 @@ not a quantity.
 row carries `"synthetic": true`. They are deterministic and contain nothing from
 any real deployment — no dialogue, no ledger, no move.
 
+On the word itself: it is a **convention, not a theory.** Almost everything a person
+makes is selected — words, films, an actor's delivery — so "synthetic" as a general
+category swallows everything and explains nothing. Here it means one narrow, checkable
+thing: **authored by a script rather than recorded from a real conversation.** That is
+the whole claim, and it is the one that matters, because a fixture that was never
+observed can prove the machinery runs and cannot prove it measures.
+
 They are there so that `pip install -e . && pytest` means something. They are not
 there to be believed.
