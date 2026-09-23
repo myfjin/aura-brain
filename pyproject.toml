@@ -1,10 +1,11 @@
 # pyproject.toml for aura-brain
 #
-# Note: this file is written for pip-install-from-git first.
-# PyPI push is HELD until:
+# Note: this file is written for pip-install-from-git first. As of 0.2.0 the
+# LOOP ships and the version is real; the PyPI push is still HELD until:
 #   (a) 2026-09-28 feel-fire lands with a real measurement
 #   (b) RESEARCH.md #3 (private why_pass.py internals) is resolved
 #   (c) at least one docs/case-studies/*.md shows the discipline in action
+# A reserved name on PyPI is a maintenance promise; we are not making it early.
 
 [build-system]
 requires = ["hatchling>=1.24"]
@@ -42,7 +43,7 @@ classifiers = [
 ]
 
 # Runtime dependencies. Kept minimal on purpose — every added dep is a claim
-# about what Brain needs to think. Fill in when the beachhead source lands.
+# about what Brain needs to think, so each one is named with its reason below.
 dependencies = [
   # The MCP server SDK. brain_mcp declares its four tools at module level
   # (`mcp = FastMCP(...)` + `@mcp.tool()`), so importing the loop imports it —
