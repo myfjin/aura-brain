@@ -131,6 +131,7 @@ include = [
   "src/aura_brain",
   "VENDORING.md",
   "CALIBRATION.md",
+  "CREW.md",
   "tools",
   "docs",
   "README.md",
