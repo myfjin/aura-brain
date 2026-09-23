@@ -8,6 +8,32 @@ The shape is small enough to name in a line: **fire → advise → outcome → g
 
 Brain **advises**. It does not enforce, and it does not wait for anyone to confirm it was right — the close-signal comes from what happens next in the record, not from a "you were right" reply. The advice is what we ship.
 
+## What this repository ships — and what it does not
+
+**It ships the engine. It does not ship the fuel.**
+
+The brain's value is not the code; it is a *calibrated floor over a corpus*. The
+corpus here is years of one crew's conversations, and that stays private — it is
+the part that is ours. What you get is the loop, the honesty floor, and the
+consult lanes, wired so you can run them and see the machinery turn over.
+
+To make `pip install -e . && pytest` mean something, `tests/fixtures/` carries a
+**synthetic** deployment, authored by `tools/make_fixtures.py`. Every file is named
+`synthetic_*` and every row is marked `"synthetic": true`, on purpose:
+
+> **Numbers from those fixtures mean nothing.** They prove the loop runs. They say
+> nothing about how well it advises. For that you must bring your own corpus and
+> grade your own outcomes.
+
+`CALIBRATION.md` states which thresholds were measured and which are still working
+guesses — including one inherited from a note that said *"retune after N=50
+labeled-outcome suggestions"*, which has not happened yet. `VENDORING.md` explains
+why `src/aura_brain/_core/` is vendored verbatim and exactly which gate is narrowed
+to keep it that way.
+
+The honest framing is: **here is the engine, and here is how to fuel it.** We are
+not giving you our fuel, because it contains our conversations.
+
 ## Why it exists — "to care"
 
 Illia, in his own words:
