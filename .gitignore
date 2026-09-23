@@ -130,8 +130,13 @@ node_modules/
 .direnv/
 .local/
 
-# derived data — embedding caches are machine-generated and encode registry content
+# derived data — embedding caches are machine-generated and encode registry content.
+# The SYNTHETIC fixtures are the exception: they are authored, not derived, and the
+# tests need them in the repository — which is exactly how a green local run hid a
+# red CI run once (the files were on disk and not in git).
 *.npz
 *.npy
 *.jsonl
 *.db
+!tests/fixtures/synthetic_*.jsonl
+!tests/fixtures/synthetic_*.db
