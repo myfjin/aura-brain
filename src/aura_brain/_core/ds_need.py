@@ -35,7 +35,7 @@ import paths  # published settings module (see VENDORING.md)
 
 PATTERNS_DIR = paths.PATTERNS_DS
 R_PATTERNS_DIR = paths.PATTERNS_R
-CACHE = HERE / "ds_keys_cache.npz"
+CACHE = paths.BRAIN_HOME / "ds_keys_cache.npz"
 QUEUE = paths.BRAIN_HOME / "math_misses.jsonl"          # shared review loop with mathbrain
 THRESHOLD = 0.30   # CALIBRATED 2026-07-05 from measurements (not guessed): five
                    # diverse negative asks scored ≤ 0.208; weakest true positive

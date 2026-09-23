@@ -55,6 +55,26 @@ dev = [
   "hypothesis>=6.100",
   "ruff>=0.5",
   "mypy>=1.10",
+  "numpy>=1.26",
+]
+
+# The consult lanes embed situations and registry keys locally. chromadb's
+# DefaultEmbeddingFunction runs MiniLM on CPU — no API key, no network — but it
+# pulls a sizeable wheel, so it is opt-in. Without it the lanes report
+# "optional dependency absent" and fail open; the loop still runs.
+embeddings = [
+  "numpy>=1.26",
+  "chromadb>=0.5",
+]
+
+# The math front-door solves exactly when an explicit computation is present.
+# Optional: absent, the lane defers rather than crashing.
+math = [
+  "sympy>=1.12",
+]
+
+everything = [
+  "aura-brain[embeddings,math]",
 ]
 
 # Docs building (mkdocs-material + mkdocstrings when the docs site lands).
@@ -91,6 +111,9 @@ packages = ["src/aura_brain"]
 [tool.hatch.build.targets.sdist]
 include = [
   "src/aura_brain",
+  "VENDORING.md",
+  "CALIBRATION.md",
+  "tools",
   "docs",
   "README.md",
   "LICENSE",
@@ -132,6 +155,11 @@ exclude_lines = [
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+# _core/ is vendored source (VENDORING.md): five thousand lines of a running
+# system. It fails lint/format/type, and reformatting it would make the published
+# copy undiffable against the canonical tree — which is the drift this repo exists
+# to avoid. Patch the gate, not the vendored code. paths.py is checked by name in CI.
+extend-exclude = ["src/aura_brain/_core"]
 
 [tool.ruff.lint]
 select = [
@@ -152,6 +180,7 @@ quote-style = "double"
 [tool.mypy]
 python_version = "3.11"
 strict = true
+exclude = "^src/aura_brain/_core/"
 warn_unused_configs = true
 warn_redundant_casts = true
 warn_unused_ignores = true

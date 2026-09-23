@@ -43,7 +43,7 @@ REGISTRY = paths.LOGIC_REGISTRY
 PATTERNS_DIR = paths.PATTERNS_DS
 R_PATTERNS_DIR = paths.PATTERNS_R
 SYS_PATTERNS_DIR = paths.PATTERNS_SYS
-CACHE = HERE / "logic_keys_cache.npz"
+CACHE = paths.BRAIN_HOME / "logic_keys_cache.npz"
 QUEUE = paths.BRAIN_HOME / "logic_misses.jsonl"        # sovereign L4 defer log (same schema as ds)
 LANE = "logic"
 

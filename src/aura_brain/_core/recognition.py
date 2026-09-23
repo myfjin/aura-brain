@@ -89,7 +89,7 @@ def _move_keys(p: dict, con) -> list:
     return [k for k in keys if k.strip()]
 
 
-_KEYS_CACHE = HERE / "keys_cache.npz"
+_KEYS_CACHE = paths.BRAIN_HOME / "keys_cache.npz"
 
 
 def _keys_matrix(pats):
