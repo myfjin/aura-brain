@@ -10,7 +10,7 @@ You are welcome to take one on, or to raise ones we haven't thought to ask.
 
 2. **N_test ≥ 60 fresh, honest outcomes** for the T5.1 A/B to reopen. A capture problem, not a coding problem — the world has to happen, and we have to be measuring when it does.
 
-3. **Where does `why_pass` live?** Brain's beachhead calls a private `why_pass.py` module in five places. The public [`whypass`](https://github.com/myfjin/whypass) package on PyPI (`pip install whypass`, Apache-2.0, zero deps) exports `lint / Finding / Record / grounded` and no more — the private internals used inside Brain are not there. Either upstream them so the beachhead compiles against the public package, or port those five call sites onto the public API. Until then Brain cannot honestly say `depends on whypass`.
+3. **Where does `why_pass` live?** The published core calls a private `why_pass.py` module in five places. The public [`whypass`](https://github.com/myfjin/whypass) package on PyPI (`pip install whypass`, Apache-2.0, zero deps) exports `lint / Finding / Record / grounded` and no more — the private internals used inside Brain are not there. Either upstream them so the core compiles against the public package, or port those five call sites onto the public API. Until then Brain cannot honestly say `depends on whypass`.
 
 4. **Duplicate names in the pattern library** — 935 rows, 933 unique names. Name-keyed maps collide silently.
 

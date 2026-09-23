@@ -148,7 +148,7 @@ Nothing below is a limitation waiting to be fixed like a bug. It is the shape of
 - **Feel is not in the ledger.** The feel signal lives in journals beside the rate. Folding it into the closure path is design work we haven't done.
 - **Only 2 of 47 ledger rows carry the `grader` tag.** Whether every future close carries it is an open invariant.
 - **Silence is ambiguous.** When Brain has nothing to say, nothing is injected — so "no advice" is indistinguishable from "no pattern". A quieter Brain looks the same as a better-informed one, and we haven't found a shape that separates them.
-- **Some boundaries are drawn, not missing.** `node.run()` / re-anchor is explicitly out of scope for the published beachhead. That is a documented line, not an omission.
+- **Some boundaries are drawn, not missing.** `node.run()` / re-anchor is explicitly out of scope for the published core: what ships is the advice loop (`advise` → decide → `record_outcome`), not the interactive re-anchor path. That is a documented line, not an omission.
 - **One symptom has an unknown cause.** At least one 1200-second session timeout occurred in a fresh, small session — size is ruled out for that instance and the cause is *unknown*. We name it unknown rather than inventing a history.
 
 For the open questions we haven't answered ourselves yet, see [`RESEARCH.md`](https://github.com/myfjin/aura-brain/blob/main/RESEARCH.md) — you are welcome to take one on, or to raise ones we haven't thought to ask.
@@ -157,7 +157,9 @@ For the open questions we haven't answered ourselves yet, see [`RESEARCH.md`](ht
 
 Apache-2.0. Contributions welcome with **DCO sign-off** (`Signed-off-by:` line in your commit).
 
-- **Getting started:** [`docs/getting-started.md`](https://github.com/myfjin/aura-brain/blob/main/docs/getting-started.md) — install from git, run the tests, and what works today
+- **Getting started:** [`docs/getting-started.md`](https://github.com/myfjin/aura-brain/blob/main/docs/getting-started.md) — install from git, run the loop, and what works today
+- **What the numbers mean:** [`CALIBRATION.md`](https://github.com/myfjin/aura-brain/blob/main/CALIBRATION.md) — which thresholds were measured, which are guesses, and the rule that keeps the ledger honest
+- **Why `_core/` is vendored:** [`VENDORING.md`](https://github.com/myfjin/aura-brain/blob/main/VENDORING.md) — the invariant, and exactly which gate is narrowed to keep it
 - **Copyright holder (LICENSE):** © 2026 Illia Hladkyi
 - **Author of record (README):** fjin ([@myfjin](https://github.com/myfjin))
 - **Substance:** came from the whole crew — see `AUTHORS`
