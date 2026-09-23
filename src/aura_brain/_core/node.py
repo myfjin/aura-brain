@@ -38,6 +38,8 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
+import paths  # published settings module (see VENDORING.md)
+
 # SH-T7.9: module-level imports made lazy — the beachhead 7-file set does not
 # include constraint_filter, brain, recognition, arbiter, or math_need.  Making
 # them lazy lets the file import cleanly without the full mesh installed.
@@ -61,6 +63,11 @@ def _ensure_deps():
         from constraint_filter import checkable_exprs as _ce
         constraint_filter = type("M", (), {"checkable_exprs": _ce})()
     if brain is None:
+        # brain.py is a HARD dependency of the published tree: it SHIPS (see
+        # VENDORING.md) and supplies embed() plus a corpus reader behind $STATE_DB.
+        # recognition.py guards its own import because that module can be imported
+        # on its own; node cannot run without brain, so the asymmetry is deliberate
+        # — a missing brain.py is a packaging bug, not a runtime condition to survive.
         brain = _lazy_import("brain")
     if recognition is None:
         recognition = _lazy_import("recognition")
