@@ -15,7 +15,6 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
@@ -54,34 +53,70 @@ PATH_EDITS: dict[str, list[tuple[str, str]]] = {
         ('PATTERNS = HERE / "patterns_library.jsonl"', "PATTERNS = paths.PATTERNS_LIBRARY"),
         ('LIB_VEC = HERE / "concept_library.npy"', "LIB_VEC = paths.CONCEPT_LIBRARY_NPY"),
         ('LIB_META = HERE / "concept_library.json"', "LIB_META = paths.CONCEPT_LIBRARY_JSON"),
+        (
+            '_KEYS_CACHE = HERE / "keys_cache.npz"',
+            '_KEYS_CACHE = paths.BRAIN_HOME / "keys_cache.npz"',
+        ),
     ],
     "advice_domain.py": [
         ('MOVES = HERE / "patterns_library.jsonl"', "MOVES = paths.PATTERNS_LIBRARY")
     ],
     "wisdom.py": [
-        ('FIRES = Path.home() / "ai-lab/streams/brain/move-fires.jsonl"', "FIRES = paths.MOVE_FIRES"),
-        ('TRIALOGUE = Path.home() / "ai-lab/trialogue/trialogue.jsonl"', "TRIALOGUE = paths.TRIALOGUE"),
-        ('sys.path.insert(0, str(Path.home() / "ai-lab/pce0"))', "sys.path.insert(0, str(paths.PCE_DIR))"),
+        (
+            'FIRES = Path.home() / "ai-lab/streams/brain/move-fires.jsonl"',
+            "FIRES = paths.MOVE_FIRES",
+        ),
+        (
+            'TRIALOGUE = Path.home() / "ai-lab/trialogue/trialogue.jsonl"',
+            "TRIALOGUE = paths.TRIALOGUE",
+        ),
+        (
+            'sys.path.insert(0, str(Path.home() / "ai-lab/pce0"))',
+            "sys.path.insert(0, str(paths.PCE_DIR))",
+        ),
     ],
     "ds_need.py": [
         (
             "The registry is the 120 run-gated patterns at ~/ai-lab/patterns_ds/harvested/; the",
             "The registry is your run-gated patterns at $AURA_PATTERNS_DS (default\n~/.aura-brain/patterns_ds/harvested/); the",
         ),
-        ('PATTERNS_DIR = Path.home() / "ai-lab/patterns_ds/harvested"', "PATTERNS_DIR = paths.PATTERNS_DS"),
-        ('R_PATTERNS_DIR = Path.home() / "ai-lab/patterns_r/harvested"', "R_PATTERNS_DIR = paths.PATTERNS_R"),
+        (
+            'PATTERNS_DIR = Path.home() / "ai-lab/patterns_ds/harvested"',
+            "PATTERNS_DIR = paths.PATTERNS_DS",
+        ),
+        (
+            'R_PATTERNS_DIR = Path.home() / "ai-lab/patterns_r/harvested"',
+            "R_PATTERNS_DIR = paths.PATTERNS_R",
+        ),
         ('QUEUE = HERE / "math_misses.jsonl"', 'QUEUE = paths.BRAIN_HOME / "math_misses.jsonl"'),
+        # derived caches must NOT land in the package dir: `pip install` would then
+        # write embeddings into site-packages, and `git add -A` would track our own
+        # registry's vectors. ds_keys_cache.npz shipped 374 embedded items once.
+        ('CACHE = HERE / "ds_keys_cache.npz"', 'CACHE = paths.BRAIN_HOME / "ds_keys_cache.npz"'),
     ],
     "logic_lane.py": [
         ('REGISTRY = HERE / "logic_registry.jsonl"', "REGISTRY = paths.LOGIC_REGISTRY"),
-        ('PATTERNS_DIR = Path.home() / "ai-lab/patterns_ds/harvested"', "PATTERNS_DIR = paths.PATTERNS_DS"),
-        ('R_PATTERNS_DIR = Path.home() / "ai-lab/patterns_r/harvested"', "R_PATTERNS_DIR = paths.PATTERNS_R"),
+        (
+            'PATTERNS_DIR = Path.home() / "ai-lab/patterns_ds/harvested"',
+            "PATTERNS_DIR = paths.PATTERNS_DS",
+        ),
+        (
+            'R_PATTERNS_DIR = Path.home() / "ai-lab/patterns_r/harvested"',
+            "R_PATTERNS_DIR = paths.PATTERNS_R",
+        ),
         (
             'SYS_PATTERNS_DIR = Path.home() / "ai-lab/patterns_sysadmin/harvested"',
             "SYS_PATTERNS_DIR = paths.PATTERNS_SYS",
         ),
         ('QUEUE = HERE / "logic_misses.jsonl"', 'QUEUE = paths.BRAIN_HOME / "logic_misses.jsonl"'),
-        ('lib = Path.home() / "aura-pattern-library" / src', "lib = paths.PATTERN_LIBRARY_ROOT / src"),
+        (
+            'CACHE = HERE / "logic_keys_cache.npz"',
+            'CACHE = paths.BRAIN_HOME / "logic_keys_cache.npz"',
+        ),
+        (
+            'lib = Path.home() / "aura-pattern-library" / src',
+            "lib = paths.PATTERN_LIBRARY_ROOT / src",
+        ),
     ],
     "arbiter.py": [
         (
@@ -108,7 +143,7 @@ PATH_EDITS: dict[str, list[tuple[str, str]]] = {
     "artifact_check.py": [
         ("HOME = Path.home()", "HOME = paths.LAB_ROOT"),
         (
-            "    roots = [HOME, HOME / \"ai-lab\", HERE, HOME / \".claude\",\n",
+            '    roots = [HOME, HOME / "ai-lab", HERE, HOME / ".claude",\n',
             '    roots = [HOME, HOME / "streams", HERE, HOME / ".claude",\n',
         ),
         ('             HOME / "ai-lab/streams"]', '             HOME / "workspace"]'),
@@ -142,8 +177,14 @@ PATH_EDITS: dict[str, list[tuple[str, str]]] = {
         ),
     ],
     "filter_tg.py": [
-        ('        "/Users/s_dio/request/telegram26.06.26/result.json"', '        str(paths.BRAIN_HOME / "export.json")'),
-        ('        "/Users/s_dio/lab-from-future/clean_dialogue.jsonl"', '        str(paths.BRAIN_HOME / "clean_dialogue.jsonl")'),
+        (
+            '        "/Users/s_dio/request/telegram26.06.26/result.json"',
+            '        str(paths.BRAIN_HOME / "export.json")',
+        ),
+        (
+            '        "/Users/s_dio/lab-from-future/clean_dialogue.jsonl"',
+            '        str(paths.BRAIN_HOME / "clean_dialogue.jsonl")',
+        ),
     ],
     "gate.py": [
         (
@@ -176,8 +217,15 @@ NEEDS_PATHS_IMPORT = set(PATH_EDITS) | {"brain.py"}
 IMP = "\nsys.path.insert(0, str(Path(__file__).resolve().parent))\nimport paths  # published settings module (see VENDORING.md)\n"
 IMP_ONLY = "\nimport paths  # published settings module (see VENDORING.md)\n"
 HAS_ANCHOR = {
-    "brain.py", "recognition.py", "distiller.py", "arbiter.py", "whypass.py",
-    "wisdom.py", "logic_lane.py", "gate.py", "generator.py",
+    "brain.py",
+    "recognition.py",
+    "distiller.py",
+    "arbiter.py",
+    "whypass.py",
+    "wisdom.py",
+    "logic_lane.py",
+    "gate.py",
+    "generator.py",
 }
 
 

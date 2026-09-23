@@ -18,6 +18,8 @@ from __future__ import annotations
 
 import os as _os
 import sys as _sys
+from importlib import import_module
+from typing import Any
 
 __version__ = "0.2.0"
 
@@ -29,28 +31,45 @@ if _CORE not in _sys.path:
     _sys.path.insert(0, _CORE)
 
 
+def _brain_mcp() -> Any:
+    """Return the vendored core module, imported lazily.
+
+    Deliberately ``Any``: ``_core/`` is vendored source and is excluded from type
+    checking (see ``VENDORING.md``). Naming the untyped boundary in exactly one
+    place is what keeps ``mypy --strict`` meaningful for the code we maintain.
+    """
+    return import_module("brain_mcp")
+
+
 def advise(
-    situation: str, recent_actions: list | None = None, caller: str = ""
-) -> dict:
+    situation: str,
+    recent_actions: list[Any] | None = None,
+    caller: str = "",
+) -> dict[str, Any]:
     """Ask the brain about a situation. Returns a dict; never raises on a bad lane.
 
-    The returned set — not its rank-1 — is the signal: read ``moves`` (top-3 plus
-    alternates) and ``consult`` (which lanes fired, and whether any errored).
+    The returned **set** — not its rank-1 — is the signal: read ``moves`` (top-3
+    plus alternates) and ``consult`` (which lanes fired, and whether any errored).
+    A lane reporting ``error`` is not the same as a lane reporting ``fired:
+    false``; the first may be dead, the second is honest.
     """
-    from aura_brain._core import brain_mcp
+    brain_mcp: Any = _brain_mcp()
+    result: dict[str, Any] = brain_mcp.advise(
+        situation, recent_actions=recent_actions, caller=caller
+    )
+    return result
 
-    return brain_mcp.advise(situation, recent_actions=recent_actions, caller=caller)
 
-
-def record_outcome(move: str, held: bool, situation: str = "") -> dict:
+def record_outcome(move: str, held: bool, situation: str = "") -> dict[str, Any]:
     """Record whether a move actually helped. This is the only signal the engine lacks.
 
-    Influence requires the advice to have arrived BEFORE the action; a consult made
-    after the fact is not a \"held\" — record it honestly and the rate stays honest.
+    Influence requires the advice to have arrived **before** the action; a consult
+    made after the fact is not a "held". Record it honestly and the rate stays
+    honest — an inflated hold poisons every number computed from the ledger.
     """
-    from aura_brain._core import brain_mcp
-
-    return brain_mcp.record_outcome(move, held, situation=situation)
+    brain_mcp: Any = _brain_mcp()
+    result: dict[str, Any] = brain_mcp.record_outcome(move, held, situation=situation)
+    return result
 
 
 __all__ = ["__version__", "advise", "record_outcome"]

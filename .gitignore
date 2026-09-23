@@ -129,3 +129,9 @@ node_modules/
 .envrc
 .direnv/
 .local/
+
+# derived data — embedding caches are machine-generated and encode registry content
+*.npz
+*.npy
+*.jsonl
+*.db
