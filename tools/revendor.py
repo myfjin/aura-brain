@@ -190,7 +190,22 @@ PATH_EDITS: dict[str, list[tuple[str, str]]] = {
         (
             'glob.glob(str(Path.home() / ".claude/projects/**/*.jsonl"), recursive=True)',
             'glob.glob(str(paths.LAB_ROOT / ".claude/projects/**/*.jsonl"), recursive=True)',
-        )
+        ),
+        # The offline corpora: crew-specific filenames, read by a HERE-relative path that
+        # cannot exist for anyone else. Declared once in the canonical tree, routed through
+        # paths.py here. (4Q, post-merge review of PR #5.)
+        (
+            'PERSONA_TXT = Path(os.environ.get("AURA_PERSONA_TXT", str(HERE / "Claude+Illia.txt")))',
+            "PERSONA_TXT = paths.PERSONA_TXT",
+        ),
+        (
+            'TG_EXPORT = Path(os.environ.get("AURA_TG_EXPORT", str(HERE / "tgexport280626/result.json")))',
+            "TG_EXPORT = paths.TG_EXPORT",
+        ),
+        (
+            'MOVE_SPACES = Path(os.environ.get("AURA_MOVE_SPACES", str(HERE)))',
+            "MOVE_SPACES = paths.MOVE_SPACES",
+        ),
     ],
     "generator.py": [
         ('ENV = Path.home() / ".hermes/profiles/steward/.env"', "ENV = paths.ENV_FILE"),

@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import glob
 import json
+import os
 import random
 import sys
 from pathlib import Path
@@ -27,13 +28,24 @@ import identity      # noqa: E402
 import brain         # noqa: E402
 import filter_tg     # noqa: E402
 
+# ── offline corpora ─────────────────────────────────────────────────────────
+# These are the gate/generator path ONLY — nothing on the advice loop reads them,
+# and the published package does not ship the files. Env-overridable so a
+# deployment can point them anywhere (the published copy routes them through
+# `paths.py`; see VENDORING.md). They were hardcoded HERE-relative, which meant
+# the published code read crew-specific filenames by a path that cannot exist
+# for anyone else.
+PERSONA_TXT = paths.PERSONA_TXT
+TG_EXPORT = paths.TG_EXPORT
+MOVE_SPACES = paths.MOVE_SPACES
+
 random.seed(7)
 REF_N = 400          # real turns embedded as the voice reference
 BASE_N = 60          # held-out real turns to measure the real baseline
 
 
 def illia_claude_turns() -> dict:
-    text = (HERE / "Claude+Illia.txt").read_text(errors="ignore")
+    text = PERSONA_TXT.read_text(errors="ignore")
     g = {"Illia": [], "Claude": []}
     for b in identity.blocks(text):
         lab = identity.label(b)
@@ -45,7 +57,7 @@ def illia_claude_turns() -> dict:
 
 
 def _tg_turns(sender: str) -> list:
-    d = json.load(open(HERE / "tgexport280626/result.json", encoding="utf-8"))
+    d = json.load(open(TG_EXPORT, encoding="utf-8"))
     out = []
     for m in d.get("messages", []):
         if m.get("type") != "message" or m.get("from") != sender:
@@ -113,9 +125,9 @@ def voice_score(text: str, R):
 
 # ── move-libraries (per character that has one) — the SUBSTANCE / novelty-safe axis ──
 _MOVE_LIB = {
-    "Steward": (HERE / "steward_moves.npy", HERE / "steward_moves.json"),
-    "Illia": (HERE / "illia_moves.npy", HERE / "illia_moves.json"),
-    "Claude": (HERE / "claude_moves.npy", HERE / "claude_moves.json"),
+    "Steward": (MOVE_SPACES / "steward_moves.npy", MOVE_SPACES / "steward_moves.json"),
+    "Illia": (MOVE_SPACES / "illia_moves.npy", MOVE_SPACES / "illia_moves.json"),
+    "Claude": (MOVE_SPACES / "claude_moves.npy", MOVE_SPACES / "claude_moves.json"),
 }
 
 
