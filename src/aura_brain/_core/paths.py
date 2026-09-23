@@ -34,9 +34,7 @@ BRAIN_HOME: Path = _env_path("AURA_BRAIN_HOME", Path.home() / ".aura-brain")
 STATE_DB: Path = _env_path("STATE_DB", BRAIN_HOME / "dialogue.db")
 
 # ── moves library + ledgers (append-only JSONL) ─────────────────────────────
-PATTERNS_LIBRARY: Path = _env_path(
-    "AURA_PATTERNS_LIBRARY", BRAIN_HOME / "patterns_library.jsonl"
-)
+PATTERNS_LIBRARY: Path = _env_path("AURA_PATTERNS_LIBRARY", BRAIN_HOME / "patterns_library.jsonl")
 CONCEPT_LIBRARY_NPY: Path = _env_path(
     "AURA_CONCEPT_LIBRARY_NPY", BRAIN_HOME / "concept_library.npy"
 )
@@ -44,9 +42,7 @@ CONCEPT_LIBRARY_JSON: Path = _env_path(
     "AURA_CONCEPT_LIBRARY_JSON", BRAIN_HOME / "concept_library.json"
 )
 OUTCOMES_LEDGER: Path = _env_path("OUTCOMES_LEDGER", BRAIN_HOME / "outcomes.jsonl")
-LOGIC_REGISTRY: Path = _env_path(
-    "AURA_LOGIC_REGISTRY", BRAIN_HOME / "logic_registry.jsonl"
-)
+LOGIC_REGISTRY: Path = _env_path("AURA_LOGIC_REGISTRY", BRAIN_HOME / "logic_registry.jsonl")
 
 # ── streams / records the lanes read ────────────────────────────────────────
 MOVE_FIRES: Path = _env_path("AURA_MOVE_FIRES", BRAIN_HOME / "move-fires.jsonl")
@@ -60,12 +56,8 @@ TRIALOGUE: Path = _env_path("AURA_TRIALOGUE", BRAIN_HOME / "trialogue.jsonl")
 # ── consult-lane registries (code you harvested, one dir per sphere) ────────
 PATTERNS_DS: Path = _env_path("AURA_PATTERNS_DS", BRAIN_HOME / "patterns_ds" / "harvested")
 PATTERNS_R: Path = _env_path("AURA_PATTERNS_R", BRAIN_HOME / "patterns_r" / "harvested")
-PATTERNS_SYS: Path = _env_path(
-    "AURA_PATTERNS_SYS", BRAIN_HOME / "patterns_sysadmin" / "harvested"
-)
-PATTERN_LIBRARY_ROOT: Path = _env_path(
-    "AURA_PATTERN_LIBRARY", BRAIN_HOME / "pattern-library"
-)
+PATTERNS_SYS: Path = _env_path("AURA_PATTERNS_SYS", BRAIN_HOME / "patterns_sysadmin" / "harvested")
+PATTERN_LIBRARY_ROOT: Path = _env_path("AURA_PATTERN_LIBRARY", BRAIN_HOME / "pattern-library")
 
 # ── optional helpers (absent is fine — those call sites fail open) ───────────
 PCE_DIR: Path = _env_path("AURA_PCE_DIR", BRAIN_HOME / "pce")
