@@ -50,6 +50,26 @@ jobs:
       - name: Mypy (strict)
         run: mypy src
 
+      # ------------------------------------------------------------------
+      # The gate that would have caught our worst packaging mistake.
+      # `py_compile` resolves no names: it passes on `import os` missing, on a
+      # wrong alias, on a module that only fails when called. A real import is
+      # the cheapest check that actually means something.
+      # ------------------------------------------------------------------
+      - name: Import gate (not py_compile)
+        run: |
+          python -c "import aura_brain; print('aura_brain', aura_brain.__version__)"
+          python -c "import aura_brain, brain_mcp; print('core loop imports')"
+
+      # _core/ is excluded from lint/format/types BY PATH (VENDORING.md). paths.py
+      # is the one core file we hand-wrote, so it is checked by name — otherwise
+      # "excluded" would quietly mean "nothing in _core is checked at all".
+      - name: Vendored settings module (checked by name)
+        run: |
+          ruff check src/aura_brain/_core/paths.py
+          ruff format --check src/aura_brain/_core/paths.py
+          mypy --strict src/aura_brain/_core/paths.py
+
   # -----------------------------------------------------------------------
   # Test matrix. PYTHONHASHSEED is set in pyproject.toml for determinism,
   # so calibration-path tests do not depend on Python's per-process hash
@@ -93,6 +113,64 @@ jobs:
           name: coverage-${{ github.sha }}
           path: coverage.xml
           retention-days: 7
+
+  # -----------------------------------------------------------------------
+  # Privacy. This repository ships CODE and ONLY code: the corpus on which the
+  # advice is based is the private part, and so is anything derived from it.
+  # Embedding caches are derived data — `ds_keys_cache.npz` once shipped 374
+  # vectors computed from a real registry, which is a leak, not noise. These
+  # three checks are cheap and they run on every PR.
+  # -----------------------------------------------------------------------
+  privacy:
+    name: privacy scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: No private absolute paths in shipped code
+        run: |
+          set -euo pipefail
+          # tools/ is deliberately out of scope: revendor.py's edit table MUST quote
+          # the canonical strings it rewrites, so it contains them by design. What
+          # ships to a user is src/ + tests/ + docs/ — that is what this checks.
+          targets=$(git ls-files 'src/**' 'tests/**' 'docs/**' '*.md' 'pyproject.toml')
+          hits=$(echo "$targets" | xargs grep -nE '/home/au|/Users/s_[a-z]+|\.hermes/profiles|~/ai-lab|/ai-lab/' 2>/dev/null || true)
+          if [ -n "$hits" ]; then
+            echo "$hits"
+            echo "::error::a private path is in a shipped file"
+            exit 1
+          fi
+          echo "clean: $(echo "$targets" | wc -l | tr -d ' ') files scanned"
+
+      - name: No credentials
+        run: |
+          set -euo pipefail
+          hits=$(git ls-files 'src/**' 'tests/**' 'docs/**' 'tools/**' '*.md' '*.toml' \
+                 | xargs grep -nIE 'sk-[A-Za-z0-9]{20,}|ghp_[A-Za-z0-9]{20,}|BEGIN [A-Z ]*PRIVATE KEY' 2>/dev/null || true)
+          if [ -n "$hits" ]; then
+            echo "$hits"
+            echo "::error::possible credential in a tracked file"
+            exit 1
+          fi
+          echo "clean"
+
+      - name: No derived data (a cache is the corpus, re-encoded)
+        run: |
+          set -euo pipefail
+          # Embedding caches are derived DATA: ds_keys_cache.npz once carried 374
+          # vectors computed from a real registry. That is a leak, not noise.
+          # The authored synthetic fixtures ARE tracked on purpose — they are named
+          # synthetic_* and they are the only data allowed in. Anything else is
+          # derived. (A green local run once hid this: .gitignore excluded the
+          # fixtures, the tests passed on disk, and CI failed without them.)
+          hits=$(git ls-files | grep -E '\.(npz|npy|jsonl|db|sqlite|sqlite3)$' \
+                 | grep -vE '^tests/fixtures/synthetic_[^/]*\.(jsonl|db)$' || true)
+          if [ -n "$hits" ]; then
+            echo "$hits"
+            echo "::error::derived data is tracked — embedding caches encode registry content"
+            exit 1
+          fi
+          echo "clean"
 
   # -----------------------------------------------------------------------
   # DCO sign-off enforcement. See CONTRIBUTING.md — we use the sign-off
