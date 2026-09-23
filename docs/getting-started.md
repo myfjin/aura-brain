@@ -89,7 +89,7 @@ rate moves. What that means in practice:
 
 - the honesty floor, the consult lanes and the ledger are real code, vendored from
   the system we run in production and left byte-identical except for its data paths;
-- the **corpus is not here**, because it is years of one crew's conversations;
+- the **corpus is not here**, because it is about seven months of one crew's conversations;
 - therefore **numbers produced from `tests/fixtures/` mean nothing.** They prove the
   loop runs, not that it measures.
 

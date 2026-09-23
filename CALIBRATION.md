@@ -10,7 +10,7 @@ threshold was measured. Some of it was; some of it was not. Both are below.
 The brain is a **calibrated floor over a corpus**. The code is the engine; the
 corpus is the fuel. This repository ships the engine and a synthetic stand-in for
 the fuel, so the loop runs. It does not ship the corpus, because the corpus is
-five years of one crew's conversations.
+about seven months of one crew's conversations.
 
 Consequence, stated plainly: **a number produced from `tests/fixtures/` measures
 nothing about how well the brain works.** Those fixtures are authored, not
