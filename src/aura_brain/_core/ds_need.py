@@ -3,7 +3,7 @@
 
 Training the MathematicalBrain with the harvested DS sphere (the maintainer, 2026-07-05):
 this organ learns the way mathbrain learns — REGISTRY + RECOGNITION, never weights.
-The registry is the 120 run-gated patterns at ~/lab/patterns_ds/harvested/; the
+The registry is the run-gated patterns at $AURA_PATTERNS_DS (paths.PATTERNS_DS); the
 recognition is embedding similarity between a situation and each pattern's own
 docstring ("what it is / when to use it" — the harvest wrote its own training set).
 
