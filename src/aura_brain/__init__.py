@@ -4,8 +4,8 @@ The LLM decides; aura-brain helps it decide deeper and wider.
 
 **0.2.0** lands the core. The loop is: ``advise`` a situation → the agent decides
 → the agent records the outcome → the derived rate moves. Everything under
-``_core/`` is vendored, unchanged except for its data paths, from the system we
-run in production — see ``VENDORING.md`` for why, and what that costs.
+``_core/`` is published from the system we run in production — see
+``VENDORING.md`` for how, and what that costs.
 
 Nothing in this package reads anyone's private corpus. All paths come from
 ``aura_brain._core.paths`` and default to an empty ``~/.aura-brain``, so every
@@ -23,18 +23,18 @@ from typing import Any
 
 __version__ = "0.2.0"
 
-# The vendored core keeps the flat-import idiom it grew up with (`import outcomes`,
-# `import paths`). Putting its directory on sys.path lets those resolve unchanged,
-# which is what keeps the published copy diffable against the canonical tree.
+# The published core imports flat (`import outcomes`, `import paths`): the publisher
+# rewrites the private package imports into that form. Putting its directory on
+# sys.path lets those resolve.
 _CORE = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "_core")
 if _CORE not in _sys.path:
     _sys.path.insert(0, _CORE)
 
 
 def _brain_mcp() -> Any:
-    """Return the vendored core module, imported lazily.
+    """Return the core module, imported lazily.
 
-    Deliberately ``Any``: ``_core/`` is vendored source and is excluded from type
+    Deliberately ``Any``: ``_core/`` is published source and is excluded from type
     checking (see ``VENDORING.md``). Naming the untyped boundary in exactly one
     place is what keeps ``mypy --strict`` meaningful for the code we maintain.
     """

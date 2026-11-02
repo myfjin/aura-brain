@@ -30,8 +30,8 @@ is narrow and exact: **these rows were never observed.**
 `CALIBRATION.md` states which thresholds were measured and which are still working
 guesses — including one inherited from a note that said *"retune after N=50
 labeled-outcome suggestions"*, which has not happened yet. `VENDORING.md` explains
-why `src/aura_brain/_core/` is vendored verbatim and exactly which gate is narrowed
-to keep it that way.
+how `src/aura_brain/_core/` is published from the private tree, and exactly which gate
+is narrowed for it.
 
 The honest framing is: **here is the engine, and here is how to fuel it.** We are
 not giving you our fuel, because it contains our conversations.
@@ -143,7 +143,7 @@ Apache-2.0. Contributions welcome with **DCO sign-off** (`Signed-off-by:` line i
 
 - **Getting started:** [`docs/getting-started.md`](https://github.com/myfjin/aura-brain/blob/main/docs/getting-started.md) — install from git, run the loop, and what works today
 - **What the numbers mean:** [`CALIBRATION.md`](https://github.com/myfjin/aura-brain/blob/main/CALIBRATION.md) — which thresholds were measured, which are guesses, and the rule that keeps the ledger honest
-- **Why `_core/` is vendored:** [`VENDORING.md`](https://github.com/myfjin/aura-brain/blob/main/VENDORING.md) — the invariant, and exactly which gate is narrowed to keep it
+- **How `_core/` is published:** [`VENDORING.md`](https://github.com/myfjin/aura-brain/blob/main/VENDORING.md) — the two regions, what the publisher refuses, and exactly which gate is narrowed
 - **Copyright holder (LICENSE):** © 2026 Illia Hladkyi
 - **Author of record (README):** fjin ([@myfjin](https://github.com/myfjin))
 - **Who makes this, and how we work together:** [`CREW.md`](https://github.com/myfjin/aura-brain/blob/main/CREW.md) — the shared crew page, the same text across our repositories

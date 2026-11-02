@@ -27,16 +27,25 @@ That is the exact failure mode Brain is meant to catch in other systems — a ra
 We rewrote `closed_count()` as a **derived** quantity, computed fresh from the ledger every time it is called:
 
 ```python
-def closed_count() -> int:
-    """Trust earned, not asserted. Recomputed from the ledger on every call."""
-    return _count_closes() - _count_tombstones()
+def closed_count() -> dict:
+    """Derived reader: count closed fires by the join (fire_hash in both files)."""
+    fires, ledger = _load_fires(), _load_ledger()
+    fire_hashes = {r.get("fire_hash") for r in fires}
+    closed_hashes = {e.get("fire_hash") for e in ledger
+                     if e.get("fire_hash") and e.get("kind") != "amend"}
+    tombstoned = {e.get("fire_hash") for e in ledger
+                  if e.get("kind") == "tombstone" and e.get("fire_hash")}
+    closed = (fire_hashes & closed_hashes) - tombstoned
+    return {"total_fires": len(fires), "closed": len(closed), ...}
 ```
 
-- `_count_closes()` walks the ledger and counts rows whose event is a close.
-- `_count_tombstones()` walks the ledger and counts rows whose event is a tombstone.
-- The subtraction is the answer.
+(Abridged; the whole function is in `src/aura_brain/_core/outcomes.py`.)
 
-No caching. No stored counter. If the ledger says three closes and one tombstone, `closed_count()` returns two — always, on every call, forever. If a future tombstone lands, the next call returns one, not because a counter was updated but because the ledger changed and the derivation followed.
+- A fire counts as closed when its `fire_hash` is both in the fire log and on a ledger row. Amendment rows carry the same hash and are not a second close.
+- A tombstone row removes its fire from the count.
+- The set difference is the answer. The returned dict also carries the `graded` flags and how far they disagree with it, so a reader sees the gap instead of trusting one number.
+
+No caching. No stored counter. If the ledger says three closes and one tombstone, `closed_count()["closed"]` is two — always, on every call, forever. If a future tombstone lands, the next call returns one, not because a counter was updated but because the ledger changed and the derivation followed.
 
 The one performance question ("this walks the ledger on every call — expensive?") was answered by measurement, not by intuition: at current ledger size the walk is under a millisecond, and the ledger grows slowly enough that the cost stays negligible for a long horizon. If it ever stops being negligible, we cache with an explicit invalidation on ledger write — but we do not cache on speculation.
 
