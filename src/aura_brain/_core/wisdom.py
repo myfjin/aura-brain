@@ -41,9 +41,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE))
-import paths  # published settings module (see VENDORING.md)
-
+import paths  # noqa: E402 — every path the Brain touches lives in paths.py
+import operator_names as OP  # noqa: E402 — the operator's name as the data spells it
 
 FIRES = paths.MOVE_FIRES
 TRIALOGUE = paths.TRIALOGUE
@@ -230,7 +229,7 @@ def _failure_rows(move: str, ledger_path: Path | None = None, id_set: set | None
     is authoritative when both sides carry ids, name equality is the legacy fallback —
     so the pain follows the move through renames/re-merges, like all trust."""
     import pattern_id
-    lp = ledger_path or (HERE / "outcomes.jsonl")
+    lp = ledger_path or paths.OUTCOMES_LEDGER
     out = []
     for r in _load(lp):
         if r.get("kind") == "review" or not pattern_id.match(r, move, id_set or set()):
@@ -257,7 +256,7 @@ def pain(move: str, v=None, text: str = "", ledger_path: Path | None = None,
             return None
         import numpy as np
         import brain
-        lp = ledger_path or (HERE / "outcomes.jsonl")
+        lp = ledger_path or paths.OUTCOMES_LEDGER
         key = (move, tuple(sorted(id_set or ())), lp.stat().st_mtime_ns)
         F = _PAIN_CACHE.get(key)
         if F is None:
@@ -341,7 +340,7 @@ def selftest() -> None:
         turn(2, "claude", "let me verify before claiming — ran the test, caught my own mistake, reverting the edit")
         # fire 2: only an external correction after → held=False, detected=other
         h2 = fire("summarize and ship it", "plan-review-before-execution", 10)
-        turn(12, "operator", "no, you misunderstood — that's not what i asked")
+        turn(12, OP.SPEAKER, "no, you misunderstood — that's not what i asked")
         # fire 3: silence after (window passed) → held=False, detected=none
         h3 = fire("just do the thing", "correcting-misunderstanding-through-pushback", 20)
         # fire 4: too fresh, nothing after → must stay PENDING
@@ -429,13 +428,7 @@ def selftest() -> None:
 
         # pce-0 border guard rides along: a broken guard must be loud HERE, in the
         # selftest habit, not discovered at the next border incident. Temp-only too.
-        try:
-            sys.path.insert(0, str(paths.PCE_DIR))
-            import pce0_boundary
-            checks.append(("pce0 border guard selftest passes",
-                           pce0_boundary.selftest(quiet=True)))
-        except Exception as e:
-            checks.append((f"pce0 border guard selftest passes (import failed: {e})", False))
+        # aura-pce's own border-guard self-test is aura-pce's to run, not the Brain's (S8, 2026-11-02).
 
         for name, passed in checks:
             print(f"  {'✓' if passed else '✗ FAIL'}  {name}")

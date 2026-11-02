@@ -23,7 +23,6 @@ import re
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
 import recognition  # noqa: E402
 
 _VAGUE    = ("something", "smth", "stuff", "somehow", "etc", "whatever", "that thing", "some kind")

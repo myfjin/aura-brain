@@ -26,9 +26,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-import paths  # published settings module (see VENDORING.md)
-
+import paths  # noqa: E402 — every path the Brain touches lives in paths.py
 LIB = paths.PATTERNS_LIBRARY
 LEDGER = paths.OUTCOMES_LEDGER
 
@@ -59,7 +57,9 @@ DEPLOYMENT = "brain-dialogue"
 # `graded` flag here so grade_queue stays accurate no matter WHICH path graded it
 # (the MCP record_review_outcome tool, or grade_queue itself). 2026-07-03.
 _STREAMS = [
-    *paths.REVIEW_VERDICTS,
+    paths.VERDICTS_CLAUDE,     # the dev machine's review fires (claude + steward hooks)
+    paths.VERDICTS_STEWARD,
+    *paths.REVIEW_VERDICTS,    # 4Q's streams on the deploy host; the merge of the dev machine's and the deploy host's histories (37d0236) kept only these
 ]
 
 
@@ -295,7 +295,7 @@ def review_trust() -> list:
 # ONE shared function. T4.9/T4.10 import close_fire(); no second write path.
 
 # Path to move-fires.jsonl (READ-ONLY — [W3], inherits T4.7 R1)
-_LAB_ROOT = _os.environ.get("LAB_ROOT", str(paths.LAB_ROOT))
+_LAB_ROOT = _os.environ.get("LAB_ROOT", str(Path.home()))
 _FIRES = paths.MOVE_FIRES
 
 

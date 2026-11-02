@@ -350,7 +350,7 @@ _NEG = [
     "brother.\n\n==========================\nhypothesis",  # markdown separator, not equation
     "edge. = real",                                  # prose =, operands are words
     "S1. - what did we leave off",                   # prose -, operands are words
-    "card at team/notes/PROBE-COMPACTION.md.",              # path, not division
+    "card at ai-lab/aura-router-private/PROBE-STEWARD-COMPACTION.md.",  # path, not division
     "the organ/operator split",                      # prose /, operands are words
     "memories = each moment we shared",              # prose =, operands are words
 ]

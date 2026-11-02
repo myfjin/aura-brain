@@ -10,7 +10,7 @@ Usage: python3 filter_tg.py <result.json> [out.jsonl]
 import json
 import re
 import sys
-import paths  # published settings module (see VENDORING.md)
+import paths  # noqa: E402 — every path the Brain touches lives in paths.py
 
 # Lines that are tool-calls / status / noise, not dialogue.
 _NOISE_PREFIX = ("💻", "✍️", "🔧", "🔍", "⚙️", "🐍", "💾", "📊", "⏳", "✅", "❌", "🔄",
@@ -83,9 +83,9 @@ def filter_export(path: str):
 
 if __name__ == "__main__":
     src = sys.argv[1] if len(sys.argv) > 1 else \
-        str(paths.BRAIN_HOME / "export.json")
+        str(paths.TG_RAW_EXPORT)
     out = sys.argv[2] if len(sys.argv) > 2 else \
-        str(paths.BRAIN_HOME / "clean_dialogue.jsonl")
+        str(paths.CLEAN_DIALOGUE)
     raw, clean = filter_export(src)
     with open(out, "w", encoding="utf-8") as f:
         for turn in clean:

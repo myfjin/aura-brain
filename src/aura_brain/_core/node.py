@@ -2,11 +2,11 @@
 """node.py — the grounded node-step. First node of the architecture locked 2026-06-28.
 
 (Not to be confused with loop.py, which is the parallel-SIMULATION Loop object. This
-is the live per-node step that replicates across .5/.8/.13: floor local on each node,
-brain singular and shared from .5.)
+is the live per-node step. The June 2026 design replicated it across three nodes (the dev machine, the deploy host, a since-retired laptop):
+floor local on each node, brain singular and shared from the dev machine.)
 
 ONE node-step joins the two organs that already exist:
-  the BRAIN  (recognition.recall — the singular soul on .5) hands back a move →
+  the BRAIN  (recognition.recall — the singular soul on the dev machine) hands back a move →
   the FLOOR  (arbiter.arbitrate — the local rails) vets it BEFORE it is emitted →
   resolve   → record the OUTCOME so confidence (Beta) is EARNED, never asserted.
 Self-redirecting: each step's result is carried into the next step's situation.
@@ -37,9 +37,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE))
-import paths  # published settings module (see VENDORING.md)
-
+import paths  # noqa: E402 — every path the Brain touches lives in paths.py
 # SH-T7.9: module-level imports made lazy — the beachhead 7-file set does not
 # include constraint_filter, brain, recognition, arbiter, or math_need.  Making
 # them lazy lets the file import cleanly without the full mesh installed.
@@ -393,8 +391,8 @@ def run(seed: str, max_cycles: int = 5, reanchor_every: int = 3, recent_actions=
     """
     _ensure_deps()  # SH-T7.9 fix: lazy deps must be loaded on entry
     lib = _library()
-    graph = (json.loads((recognition.HERE / "graph.json").read_text())
-             if (recognition.HERE / "graph.json").exists() else {})
+    graph = (json.loads(paths.GRAPH.read_text())
+             if paths.GRAPH.exists() else {})
     recent = list(recent_actions or [])
     situation, visited, traj = seed, [], []
 
@@ -479,7 +477,7 @@ def _show_gen(traj, budget, stop):
 
 
 def main():
-    print("grounded node — first node (.5):  brain → floor → resolve")
+    print("grounded node — first node (the dev machine):  brain → floor → resolve")
     print(f"(act-gate: ≥{ACT_MIN_OUTCOMES} recorded outcomes AND Beta-mean ≥ {ACT_MEAN};"
           " until earned, the brain only ADVISES)")
     recent = []

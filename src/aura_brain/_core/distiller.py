@@ -19,7 +19,7 @@ Pipeline:
   7. append to reasoning_patterns.jsonl (openable) + print + show real sources
 
 Run: python3 distiller.py [--match cloud] [--cluster N] [--role user] [--limit 1500]
-Reuses llm_namer.py's auth pattern (ANTHROPIC_API_KEY from steward .env).
+ANTHROPIC_API_KEY comes from the environment (paths.secret).
 """
 from __future__ import annotations
 
@@ -34,13 +34,10 @@ from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-import paths  # published settings module (see VENDORING.md)
+import paths  # noqa: E402 — every path the Brain touches lives in paths.py
+import brain  # noqa: E402  (load_dialogue, embed, kmeans_cosine, cluster_terms)
 
-import brain  # noqa: E402  (load_dialogue, embed, kmeans_cosine, cluster_terms, STATE_DB)
-
-ENV = paths.ENV_FILE
-OUT = paths.BRAIN_HOME / "reasoning_patterns.jsonl"
+OUT = paths.REASONING_PATTERNS
 DEFAULT_MODEL = "claude-sonnet-4-6"   # distillation is rare + high-value → quality over Haiku
 MAX_MEMBERS_IN_PROMPT = 60
 MAX_CHARS_PER_MEMBER = 400
@@ -71,16 +68,11 @@ class ReasoningPattern:
     cluster_terms: list = field(default_factory=list)
 
 
-# ── auth: mirror llm_namer.py (ANTHROPIC_API_KEY from steward .env) ────────
+# ── auth: ANTHROPIC_API_KEY from the environment (paths.secret) ───────────────
 def _load_key() -> str:
-    if ENV.exists():
-        for line in ENV.read_text().splitlines():
-            if line.strip().startswith("ANTHROPIC_API_KEY"):
-                return line.split("=", 1)[1].strip().strip('"').strip("'")
-    import os
-    k = os.environ.get("ANTHROPIC_API_KEY", "")
+    k = paths.secret("ANTHROPIC_API_KEY")
     if not k:
-        raise RuntimeError(f"ANTHROPIC_API_KEY not found in {ENV} or env")
+        raise RuntimeError("ANTHROPIC_API_KEY not found in the environment (or in AURA_ENV_FILE, if set)")
     return k
 
 
@@ -176,7 +168,7 @@ s = 1 if it backs ≥1 field else 0; f = the field names it backs."""
 
 
 def _full_text(ids: list) -> dict:
-    con = sqlite3.connect(f"file:{brain.STATE_DB}?mode=ro", uri=True)
+    con = sqlite3.connect(f"file:{paths.need('STATE_DB')}?mode=ro", uri=True)
     out = {}
     for i in ids:
         row = con.execute("SELECT content FROM messages WHERE id=?", (i,)).fetchone()
@@ -348,7 +340,7 @@ def main():
 
     # PROVE it — open the surviving sources (A6, demonstrated not claimed)
     print("\n  --- open the verified sources (these genuinely hold the pattern up) ---")
-    con = sqlite3.connect(f"file:{brain.STATE_DB}?mode=ro", uri=True)
+    con = sqlite3.connect(f"file:{paths.need('STATE_DB')}?mode=ro", uri=True)
     for sid in supported[:4]:
         row = con.execute("SELECT content FROM messages WHERE id=?", (sid,)).fetchone()
         excerpt = (row[0][:160].replace("\n", " ") if row else "(not found)")
@@ -367,14 +359,14 @@ def main():
     with OUT.open("a", encoding="utf-8") as f:
         f.write(json.dumps(rec, ensure_ascii=False) + "\n")
     print(f"\n[6] appended (verified-grounded) → {OUT}")
-    print(f"    verify any source yourself:  sqlite3 {brain.STATE_DB} 'SELECT content FROM messages WHERE id=<id>'")
+    print(f"    verify any source yourself:  sqlite3 {paths.need('STATE_DB')} 'SELECT content FROM messages WHERE id=<id>'")
 
     # [7] auto-close the pipeline: propagate raw → patterns_library so recognition can
     # actually fire this new move (otherwise it's distilled-but-invisible — the seam that
     # went 5 days stale, 2026-07-03). FREE variant only (--no-abstract); auto-running the
     # PAID full merge would be an unattended credit-spender (standing constraint).
     import subprocess
-    merge_py = Path(__file__).resolve().parent / "merge.py"
+    merge_py = Path(__file__).resolve().parents[1] / "learning" / "merge.py"
     print("\n[7] auto-merge (--no-abstract, free) → patterns_library.jsonl …")
     try:
         subprocess.run([sys.executable, str(merge_py), "--no-abstract"], check=False, timeout=180)

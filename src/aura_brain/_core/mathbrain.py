@@ -24,10 +24,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-import paths  # published settings module (see VENDORING.md)
-
-QUEUE = paths.BRAIN_HOME / "math_misses.jsonl"
+import paths  # noqa: E402 — every path the Brain touches lives in paths.py
+QUEUE = paths.MATH_MISSES
 THRESHOLD = 0.7
 assert 0.5 <= THRESHOLD <= 0.99, "threshold out of bounds [0.5, 0.99]"
 _OP_HINTS = {"factor", "simplify", "solve", "diff", "integrate", "expand"}

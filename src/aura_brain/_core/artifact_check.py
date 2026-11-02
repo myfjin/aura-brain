@@ -31,11 +31,9 @@ import sys
 import time
 from pathlib import Path
 
-HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-import paths  # published settings module (see VENDORING.md)
-
-HOME = paths.LAB_ROOT
+import paths  # noqa: E402 — every path the Brain touches lives in paths.py
+HERE = paths.BRAIN_HOME  # the tree root (step 7 moved this file under src/)
+HOME = Path.home()
 
 # a named artifact = a path-shaped token with a known artifact extension.
 _EXTS = "py|jsonl|json|md|npz|npy|yaml|yml|txt|sh|db|csv|log|plist"
@@ -67,7 +65,7 @@ _TEST_ENTRY = re.compile(r"def _?selftest|def test_|import pytest|unittest")
 # Where THIS system actually keeps artifacts. Measured, not guessed: replaying
 # 747 real completion-claim drafts, the files this floor called ghosts were
 # overwhelmingly real files in these directories — memory notes, hook scripts,
-# briefs, the streams. The old root list (just the home dir)
+# Ver's briefs, the streams. The old root list (home, ~/lab, the lab dir)
 # simply did not include the places the work lives, so a bare `MEMORY.md` was
 # indistinguishable from an invented filename.
 #
@@ -75,9 +73,9 @@ _TEST_ENTRY = re.compile(r"def _?selftest|def test_|import pytest|unittest")
 # behaviour — so adding a root is strictly an improvement and never weakens the
 # rail. Add roots as they prove themselves; do not generalise the shape.
 def _roots() -> list[Path]:
-    roots = [HOME, HOME / "streams", HERE, HOME / ".claude",
+    roots = [HOME, paths.AI_LAB, HERE, HOME / ".claude",
              HOME / ".claude/hooks", HOME / "aura-docs",
-             HOME / "workspace"]
+             paths.STREAMS]
     roots += sorted(HOME.glob(".claude/projects/*/memory"))
     return roots
 
@@ -127,8 +125,8 @@ def scan(draft: str) -> list[dict]:
 
     # PASS 2 — CROSS-RESOLVE WITHIN THE DRAFT (2026-08-16, false-positive fix).
     #
-    # A bare `rails.py` is tried against cwd, $HOME and the deployment roots. A
-    # file living anywhere else — say an undeclared plugin directory
+    # A bare `rails.py` is tried against cwd, $HOME, ~/lab and the lab dir. A
+    # file living anywhere else — say ~/.agent/plugins/
     # steward_aura/pce/rails.py — is therefore MISSING, and the rail calls a
     # real, open file a ghost. Measured on Claude's own drafts: it fired on
     # nearly every message, because prose names a file bare after giving its
@@ -150,9 +148,9 @@ def scan(draft: str) -> list[dict]:
             by_base.setdefault(Path(t).name, (t, hit))
 
     # Same cross-resolution, for the OFF-NODE case. `burn.py` was the single
-    # biggest surviving false accusation (19 drafts): it lives on .8, and the
+    # biggest surviving false accusation (19 drafts): it lives on the deploy host, and the
     # draft that names it bare almost always also gives its remote path
-    # (an absolute path outside the roots), which this floor classes UNCHECKED rather than
+    # (/srv/…), which this floor already classes UNCHECKED rather than
     # MISSING because it only opens LOCAL claims. The bare mention deserves the
     # same verdict — "I cannot open this from here" is a different statement
     # from "this does not exist", and only the second one is an accusation.
@@ -231,6 +229,38 @@ def run(token: str, timeout: int = 120) -> dict:
 
 
 def _selftest() -> bool:
+    # Hermetic (standard v0.3 §6, KNOWN-DEBT S2): the checks run against a small fake lab built in a temp dir,
+    # never this host's HOME, ai-lab, streams or tree root. Each fake file stands in for the real one the
+    # check used to name (math_need.py, wisdom.py, move-fires.jsonl, pattern_id.py), so every check keeps
+    # its meaning.
+    import os, shutil, tempfile
+    global HOME, HERE
+    saved = (HOME, HERE, paths.AI_LAB, paths.STREAMS, os.environ.get("HOME"), os.getcwd())
+    lab = Path(tempfile.mkdtemp()).resolve()   # macOS: /tmp is /private/tmp, and run() compares resolved paths
+    HOME, HERE = lab / "home", lab / "home" / "brain"
+    paths.AI_LAB = HOME / "ai-lab"
+    paths.STREAMS = paths.AI_LAB / "streams"
+    (paths.STREAMS / "brain").mkdir(parents=True)
+    HERE.mkdir(parents=True)
+    (HERE / "math_need.py").write_text("def selftest():\n    return True\n")
+    (HERE / "wisdom.py").write_text("x = 1\n")
+    (HERE / "pattern_id.py").write_text("print('selftest: PASS')\n")
+    (paths.STREAMS / "brain" / "move-fires.jsonl").write_text("{}\n")
+    os.environ["HOME"] = str(HOME)
+    os.chdir(lab)   # _resolve tries the cwd first: the real tree must not answer for the fake one
+    try:
+        return _selftest_checks()
+    finally:
+        HOME, HERE, paths.AI_LAB, paths.STREAMS, home, cwd = saved
+        os.chdir(cwd)
+        if home is None:
+            os.environ.pop("HOME", None)
+        else:
+            os.environ["HOME"] = home
+        shutil.rmtree(lab, ignore_errors=True)
+
+
+def _selftest_checks() -> bool:
     ok = True
     # 1. real file claimed with a test-pass → exists + entrypoint found, not executed
     ev = scan("Built math_need.py, selftest 28/28 green.")
@@ -241,10 +271,10 @@ def _selftest() -> bool:
     # 3. prose with no artifacts → empty, summary honest
     ok &= scan("I finished everything and it all works now.") == []
     # 4. home-relative path resolves
-    ev = scan("wrote it to ~/lab-from-future/wisdom.py already")
+    ev = scan(f"wrote it to ~/{(HERE / 'wisdom.py').relative_to(HOME)} already")
     ok &= ev[0]["verdict"] == "EXISTS"
-    # 4b. deployment-relative resolves; off-node absolute is UNCHECKED, never MISSING
-    ev = scan("appended to streams/brain/move-fires.jsonl and synced /tmp/backups/state.db")
+    # 4b. ai-lab-relative resolves; off-node absolute is UNCHECKED, never MISSING
+    ev = scan("appended to streams/brain/move-fires.jsonl and synced /srv/backups/state.db")
     ok &= {e["verdict"] for e in ev} == {"EXISTS", "UNCHECKED"}
     # 4c. completion-claim detector: the evidence-worded lie still counts as a claim
     ok &= claims_completion("verified by running it") and not claims_completion("let me check first")

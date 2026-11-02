@@ -38,7 +38,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE))
 from constraint_filter import checkable_exprs  # noqa: E402  pure-stdlib, safe at import
 
 VERDICT_UNRESOLVED = ("? uncertain — deterministic surfacing only; resolve by weighing the "
