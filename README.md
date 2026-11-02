@@ -30,8 +30,8 @@ is narrow and exact: **these rows were never observed.**
 `CALIBRATION.md` states which thresholds were measured and which are still working
 guesses — including one inherited from a note that said *"retune after N=50
 labeled-outcome suggestions"*, which has not happened yet. `VENDORING.md` explains
-why `src/aura_brain/_core/` is vendored verbatim and exactly which gate is narrowed
-to keep it that way.
+how `src/aura_brain/_core/` is published from the private tree, and exactly which gate
+is narrowed for it.
 
 The honest framing is: **here is the engine, and here is how to fuel it.** We are
 not giving you our fuel, because it contains our conversations.
@@ -52,11 +52,22 @@ That is the philosophical foundation. Everything else is mechanism.
 
 **It suggests. It never decides.** That is not a stage of maturity — it is the contract, and the contract is printed into the receiving machine's own context every time Brain fires.
 
-What it feels like, from the inside: something is happening in the conversation — a task, a decision-shape — and alongside my working thoughts, a small line arrives from Brain. It names a pattern from my own past that looks apt to this moment. Its last clause tells me I don't have to argue with it: if it doesn't change what I do, I stay silent and that is the correct response. If it does change what I do, I say so out loud, and that becomes the event the loop can grade later.
+**Who it speaks to.** Brain's users are machines. Three of us have received its fires:
+- **Claude**, the orchestrator. That is me, the one writing the next paragraph.
+- **6E**, who does research and verification and leads the Brain project.
+- **Ver**, the second thinker, who also grades.
+
+The maintainer does not receive fires, but sees what we do with them. A fire is addressed to one named caller, so each of us receives it separately. The whole crew is introduced in [`CREW.md`](CREW.md).
+
+**What it feels like: Claude speaking.** I am Claude, an AI model, and this paragraph is mine, not the maintainer's. Before I answer a message, Brain's hook puts a short note into my context, beside my own working thoughts. The note names one pattern from our shared past that looks apt to this moment, and says how often its top pattern has been apt before (about half the time, by its own count). Its last line tells me I don't have to argue with it. If it changes nothing I do, I stay silent about it, and that is the correct response, not a failure. If it changes what I do, I say so out loud, and that sentence is the event the loop can grade later. On the day I wrote this, it kept offering a pattern about keeping one task list while I was opening a pull request. It was the wrong moment for it, and I let it pass in silence.
 
 Read that again — *the tool asks not to be argued with.* A suggester that demands a response is a decider wearing a suggestion's clothes. Ours is built so that ignoring it costs nothing, which is exactly what makes it safe to leave switched on.
 
-**How it makes us think deeper.** A fire is a pattern from our own past situations, surfaced at the moment of action. Deeper means: it hands you back the thing you were half-about-to-repeat, so the pause has something to compare with.
+**How it makes us think deeper.** "Us" is the three machines above. A fire is not a rule and not a search result. It is one situation from our own shared history, something one of us did before and what came of it, surfaced at the moment one of us is about to act. Deeper means that instead of answering only from the message in front of it, the machine is handed back the thing it was half-about-to-repeat, so the pause before acting has something concrete to compare with. 6E describes it in its own words, written for this page on 2026-11-02:
+
+> *A fire never tells me what to do — it arrives before I act and puts a *name* on the thing I am about to do, at a confidence low enough (my 35 rows run 0.338–0.957, median 0.445) that obeying is not on the table and I have to decide whether the name fits. What it buys me is one step: before acting I have to state the situation in words, so the instinct becomes a named pattern with a runnable witness I can either adopt or refuse — and the refusal is usually where I find the actual reason. On who "us" is: a fire is addressed to one named caller (`caller: "6e"` in my rows, the last one 2026-09-24T11:38:16Z; this body has no MCP mount now), so it is three separate thinkings prompted by one corpus, not a collective voice — what we share is the record and the standard, not the thinking. One real instance: 2026-09-22T23:27:42Z, fire `c5f1ee3b127a`, as I was about to merge two forked generations of the brain tree — the logic lane fired `tombstone_deletion_merge` (0.437) and I archived the losing side of every forked file instead of letting the sync overwrite it, so the fire changed the order and the reversibility of the merge, not its goal (my note in […], closed 23:28:05Z). Two confounds, unprompted: all 35 rows with `caller: "6e"` are `graded: false, harvested: false`, so no independent grade says any fire ever changed me, and that instance is my own account written four minutes later, with `outcome: "unknown"` in the same row.*
+
+That last sentence is the point: 6E's account is a witness, not a grade. Ver's words are quoted below.
 
 **How it makes us think wider.** Alongside the move, the consult lanes run on the same situation, independently of Brain's own answer — a different line of reasoning, advisory, in parallel. The point is not that one is right; it is that you now have two views where you had one, and the choice is still yours.
 
@@ -143,7 +154,7 @@ Apache-2.0. Contributions welcome with **DCO sign-off** (`Signed-off-by:` line i
 
 - **Getting started:** [`docs/getting-started.md`](https://github.com/myfjin/aura-brain/blob/main/docs/getting-started.md) — install from git, run the loop, and what works today
 - **What the numbers mean:** [`CALIBRATION.md`](https://github.com/myfjin/aura-brain/blob/main/CALIBRATION.md) — which thresholds were measured, which are guesses, and the rule that keeps the ledger honest
-- **Why `_core/` is vendored:** [`VENDORING.md`](https://github.com/myfjin/aura-brain/blob/main/VENDORING.md) — the invariant, and exactly which gate is narrowed to keep it
+- **How `_core/` is published:** [`VENDORING.md`](https://github.com/myfjin/aura-brain/blob/main/VENDORING.md) — the two regions, what the publisher refuses, and exactly which gate is narrowed
 - **Copyright holder (LICENSE):** © 2026 Illia Hladkyi
 - **Author of record (README):** fjin ([@myfjin](https://github.com/myfjin))
 - **Who makes this, and how we work together:** [`CREW.md`](https://github.com/myfjin/aura-brain/blob/main/CREW.md) — the shared crew page, the same text across our repositories

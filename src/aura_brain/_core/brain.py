@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """The brain that builds its own logic.
 
-Definition (decided 2026-06-27): PCE is "a brain with logic who builds himself
-logic — literally a brain." The key word is *himself*. We do NOT hand it the
+The maintainer's definition (2026-06-27): PCE is a brain with logic that builds its own
+logic, literally a brain. The key word is *its own*. We do NOT hand it the
 categories (that was the regex decomposer's mistake — five pre-written sysadmin
 types). Instead the brain FORMS its own concepts
 from the real dialogue:
@@ -32,9 +32,8 @@ import sys
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
-import paths  # published settings module (see VENDORING.md)
+import paths  # noqa: E402 — every path the Brain touches lives in paths.py
 
-STATE_DB = paths.STATE_DB  # YOUR corpus; unset -> ~/.aura-brain/dialogue.db
 OUT = paths.BRAIN_OUT
 
 # ── perception: pull REAL dialogue, strip the noise ───────────────────────
@@ -58,7 +57,7 @@ def _is_noise(text: str) -> bool:
 
 
 def load_dialogue(role: str = "user", limit: int = 1500) -> list[dict]:
-    con = sqlite3.connect(f"file:{STATE_DB}?mode=ro", uri=True)
+    con = sqlite3.connect(f"file:{paths.need('STATE_DB')}?mode=ro", uri=True)
     where = "" if role == "all" else "AND role = ?"
     args = () if role == "all" else (role,)
     rows = con.execute(
@@ -83,6 +82,13 @@ def load_dialogue(role: str = "user", limit: int = 1500) -> list[dict]:
 
 # ── concept-formation: embed, then let clusters form THEMSELVES ───────────
 def embed(texts: list[str]):
+    """L2-normalised embeddings of `texts` (chromadb's DefaultEmbeddingFunction).
+
+    Does NOT fail open: without the `embeddings` extra (chromadb) the import below raises.
+    Every caller must guard it, by checking `recognition._embedder_available()` first or by
+    wrapping the call in try/except, so a missing embedder silences that lane instead of
+    crashing it. The extras fail open only because their callers do this (6E, step-7 deps review).
+    """
     from chromadb.utils.embedding_functions import DefaultEmbeddingFunction
     import numpy as np
     vecs = np.array(DefaultEmbeddingFunction()(texts), dtype="float32")

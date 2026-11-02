@@ -14,7 +14,7 @@ does and does not do for you once it runs.
 - **git**
 
 Runtime dependencies are declared and installed for you: the **MCP server SDK**
-(`mcp`, pinned below 2 — the vendored core is written against v1) and **numpy**.
+(`mcp`, pinned below 2 — the core is written against v1) and **numpy**.
 Two heavier extras are opt-in:
 
 - `[embeddings]` — `chromadb`, for the local MiniLM embedder the consult lanes use.
@@ -75,8 +75,10 @@ failure.
 The brain is a **calibrated floor over a corpus**, and it ships without one. Every
 path it reads is environment-driven and defaults to an empty `~/.aura-brain`, so
 until you supply data each lane fails **open with a loud warning** rather than
-guessing. `src/aura_brain/_core/paths.py` is the single place all of it is declared,
-and the
+guessing. `src/aura_brain/_core/paths.py` is the single place all of it is declared:
+the core reads every path through it (`paths.X`, or `paths.need("X")` for a route
+with no default, which fails naming the variable to set), and a publish is refused
+if the core reads a name it does not define. The
 [Connecting your own data](https://github.com/myfjin/aura-brain/wiki/Connecting-your-own-data)
 wiki page gives the shape each file must have — the moves library, the append-only
 outcomes ledger, the fire log, the consult-lane registries, and the dialogue corpus
@@ -87,8 +89,9 @@ outcomes ledger, the fire log, the consult-lane registries, and the dialogue cor
 **0.2.0 is the loop.** `advise()` → you decide → `record_outcome()` → the derived
 rate moves. What that means in practice:
 
-- the honesty floor, the consult lanes and the ledger are real code, vendored from
-  the system we run in production and left byte-identical except for its data paths;
+- the honesty floor, the consult lanes and the ledger are real code, published from
+  the system we run in production by one script that removes personal data and names
+  machines by role, and otherwise leaves it as it runs (`VENDORING.md`);
 - the **corpus is not here**, because it is about seven months of one crew's conversations;
 - therefore **numbers produced from `tests/fixtures/` mean nothing.** They prove the
   loop runs, not that it measures.
@@ -96,7 +99,7 @@ rate moves. What that means in practice:
 `CALIBRATION.md` states which thresholds were actually measured (one) and which are
 still working guesses (the rest), including one inherited with the note *"retune
 after N=50 labeled-outcome suggestions"* — which has not happened. `VENDORING.md`
-states exactly which gate is narrowed for the vendored core, and why.
+states exactly which gate is narrowed for the published core, and why.
 
 ## Why not PyPI yet
 

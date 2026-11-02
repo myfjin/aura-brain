@@ -35,7 +35,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE))
 
 # unrelated, diverse control situations — a move that ALSO fires on these is a tautology.
 CONTROLS = (

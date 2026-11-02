@@ -3,8 +3,7 @@
 
 Training the MathematicalBrain with the harvested DS sphere (the maintainer, 2026-07-05):
 this organ learns the way mathbrain learns — REGISTRY + RECOGNITION, never weights.
-The registry is your run-gated patterns at $AURA_PATTERNS_DS (default
-~/.aura-brain/patterns_ds/harvested/); the
+The registry is the run-gated patterns at $AURA_PATTERNS_DS (paths.PATTERNS_DS); the
 recognition is embedding similarity between a situation and each pattern's own
 docstring ("what it is / when to use it" — the harvest wrote its own training set).
 
@@ -30,13 +29,15 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-import paths  # published settings module (see VENDORING.md)
-
+import paths  # noqa: E402 — every path the Brain touches lives in paths.py
 PATTERNS_DIR = paths.PATTERNS_DS
+# R patterns come from the signed library, nested by category (r/<category>/<name>.R).
+# The old PATTERNS_R (~/lab/patterns_r/harvested) was gone, and ds_need silently indexed
+# 0 R patterns from at least 2026-09-23 until 2026-11-01. paths.PATTERNS_R points into the library now.
 R_PATTERNS_DIR = paths.PATTERNS_R
-CACHE = paths.BRAIN_HOME / "ds_keys_cache.npz"
-QUEUE = paths.BRAIN_HOME / "math_misses.jsonl"          # shared review loop with mathbrain
+_R_PATHS: dict = {}               # name -> .R path, filled by _keys(), read for the witness
+CACHE = paths.DATA / "ds_keys_cache.npz"
+QUEUE = paths.MATH_MISSES          # shared review loop with mathbrain
 THRESHOLD = 0.30   # CALIBRATED 2026-07-05 from measurements (not guessed): five
                    # diverse negative asks scored ≤ 0.208; weakest true positive
                    # scored 0.346. 0.30 sits in the measured gap with margin both
@@ -96,7 +97,8 @@ def _keys() -> list[tuple[str, str, str]]:
         key = f"{p.stem.replace('_', ' ')}. Category: {cat}. {' '.join(doc.split())}"
         out.append((p.stem, "PY", key[:500]))
     if R_PATTERNS_DIR.exists():
-        for p in sorted(R_PATTERNS_DIR.glob("*.R")):
+        for p in sorted(R_PATTERNS_DIR.rglob("*.R")):
+            _R_PATHS[p.stem] = p
             doc = _r_header(p)
             key = (f"{p.stem.replace('_', ' ')}. Language: R, base-R implementation "
                    f"verified against R's built-in oracle. {doc}")
@@ -107,7 +109,6 @@ def _keys() -> list[tuple[str, str, str]]:
 def _index():
     """Names + embedded keys, cached; re-embeds only when the registry changes."""
     import numpy as np
-    sys.path.insert(0, str(HERE))
     import brain
 
     keys = _keys()
@@ -135,7 +136,6 @@ def _index():
 
 def ds_need(situation: str, defer_log: bool = True) -> DSNeed:
     import numpy as np
-    sys.path.insert(0, str(HERE))
     import brain
 
     names, spheres, K = _index()
@@ -148,7 +148,7 @@ def ds_need(situation: str, defer_log: bool = True) -> DSNeed:
     cands = [(names[i], round(float(scores[i]), 3), spheres[i]) for i in order]
     top_name, top_score, top_sphere = cands[0]
     if top_score >= THRESHOLD:
-        witness = (f"Rscript {R_PATTERNS_DIR / (top_name + '.R')}" if top_sphere == "R"
+        witness = (f"Rscript {_R_PATHS.get(top_name, R_PATTERNS_DIR / (top_name + '.R'))}" if top_sphere == "R"
                    else f"python3 {PATTERNS_DIR / (top_name + '.py')}")
         return DSNeed(True, top_name, top_score, cands, witness, top_sphere)
     if defer_log:
@@ -165,12 +165,9 @@ def ds_need(situation: str, defer_log: bool = True) -> DSNeed:
 # (2026-07-06) these two queries lost their correct top-1 to distractors.
 # The FIX is a build (lexical rerank or a graded-feedback channel), never
 # accept-set widening. If a known miss passes again, REMOVE it from here.
-KNOWN_MISSES = {
-    "give me a confidence interval for the mean of this small sample":
-        "lln_clt_demo (a demonstration) outcompetes the CI tool since the 204-index",
-    "cluster these two interleaved crescent shapes":
-        "hierarchical_agglomerative retook top-1 at the 204-index (margin was thin)",
-}
+# Removed 2026-11-02 (6E, D2): the confidence-interval and crescent asks pass again, so excusing them
+# would hide their next regression.
+KNOWN_MISSES = {}
 
 
 def selftest() -> int:
@@ -193,7 +190,8 @@ def selftest() -> int:
           "walk_forward_validation"}),
         ("my regression is being wrecked by a few extreme outliers",
          {"ransac_robust_regression", "huber_robust_regression", "theil_sen_estimator",
-          "iqr_outlier_detection", "winsorize_clip_outliers"}),
+          "iqr_outlier_detection", "winsorize_clip_outliers",
+          "robust_streaming_mad"}),   # 6E, D2 2026-11-02: an apt robust method; the ranking is not touched
         # R-sphere reach (added when the registry learned R, 2026-07-06):
         ("verify my regression coefficients against R's lm oracle",
          {"lm_diagnostics", "linear_regression_normal_eq"}),

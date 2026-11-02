@@ -51,7 +51,7 @@ dependencies = [
   # "No module named 'mcp'" while every developer machine had it already.
   #
   # PINNED BELOW 2: mcp 2.x renamed FastMCP to MCPServer and changed the decorator
-  # API. The vendored core is written against v1. Unpinned, every new install got
+  # API. The core is written against v1. Unpinned, every new install got
   # 2.x and the loop would not import at all — which is what CI caught. Migrating
   # to the v2 API is a tracked follow-up, not a silent break.
   "mcp>=1.0,<2",
@@ -174,10 +174,10 @@ exclude_lines = [
 [tool.ruff]
 line-length = 100
 target-version = "py311"
-# _core/ is vendored source (VENDORING.md): five thousand lines of a running
-# system. It fails lint/format/type, and reformatting it would make the published
-# copy undiffable against the canonical tree — which is the drift this repo exists
-# to avoid. Patch the gate, not the vendored code. paths.py is checked by name in CI.
+# _core/ is published source (VENDORING.md): several thousand lines of a running
+# system, written by the publisher in the private repo. It fails lint/format/type,
+# and reformatting it here would be undone by the next publish: fix the code in the
+# private tree. paths.py is public-owned and checked by name in CI.
 extend-exclude = ["src/aura_brain/_core"]
 
 [tool.ruff.lint]

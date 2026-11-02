@@ -71,7 +71,8 @@ jobs:
           mypy --strict src/aura_brain/_core/paths.py
 
   # -----------------------------------------------------------------------
-  # Test matrix. PYTHONHASHSEED is set in pyproject.toml for determinism,
+  # Test matrix. PYTHONHASHSEED is set on the pytest step below (not in
+  # pyproject.toml: pytest's `env` needs pytest-env) for determinism,
   # so calibration-path tests do not depend on Python's per-process hash
   # randomization (T7.13 lesson: `list(<set of str>)` was the bug).
   # -----------------------------------------------------------------------
@@ -130,9 +131,8 @@ jobs:
       - name: No private absolute paths in shipped code
         run: |
           set -euo pipefail
-          # tools/ is deliberately out of scope: revendor.py's edit table MUST quote
-          # the canonical strings it rewrites, so it contains them by design. What
-          # ships to a user is src/ + tests/ + docs/ — that is what this checks.
+          # tools/ is out of scope: it ships nothing (make_fixtures.py builds the
+          # synthetic fixtures). What ships to a user is src/ + tests/ + docs/ — that is what this checks.
           targets=$(git ls-files 'src/**' 'tests/**' 'docs/**' '*.md' 'pyproject.toml')
           hits=$(echo "$targets" | xargs grep -nE '/home/me|/Users/[a-z_]+|\.hermes/profiles|~/ai-lab|/ai-lab/' 2>/dev/null || true)
           if [ -n "$hits" ]; then

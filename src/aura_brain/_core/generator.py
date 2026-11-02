@@ -21,16 +21,14 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE))
-import paths  # published settings module (see VENDORING.md)
-
+import paths  # noqa: E402 — every path the Brain touches lives in paths.py
+import operator_names as OP  # noqa: E402 — the operator's name as the data spells it
 import identity   # noqa: E402  (block segmentation + labeling → harvest real example turns)
 import gate       # noqa: E402  (live faithfulness filter: voice-reference + scoring)
 
-ENV = paths.ENV_FILE
 # The persona corpus (all THREE voices, jsonl) once built; else the legacy Claude+Operator.txt.
-_PERSONA_CORPUS = paths.BRAIN_HOME / "persona_corpus.jsonl"
-CORPUS = _PERSONA_CORPUS if _PERSONA_CORPUS.exists() else paths.BRAIN_HOME / "persona.txt"
+_PERSONA_CORPUS = paths.PERSONA_CORPUS
+CORPUS = _PERSONA_CORPUS if _PERSONA_CORPUS.exists() else paths.PERSONA_TXT
 
 # ── BUDGET GUARD — the per-run cap (this is the part the maintainer asked to code) ──
 _PRICES = {  # USD per 1M tokens (approx)
@@ -60,10 +58,10 @@ class BudgetGuard:
 
 
 def _key() -> str:
-    for line in ENV.read_text().splitlines():
-        if line.strip().startswith("ANTHROPIC_API_KEY"):
-            return line.split("=", 1)[1].strip().strip('"').strip("'")
-    raise RuntimeError("no ANTHROPIC_API_KEY in .env")
+    k = paths.secret("ANTHROPIC_API_KEY")
+    if not k:
+        raise RuntimeError("ANTHROPIC_API_KEY not found in the environment (or in AURA_ENV_FILE, if set)")
+    return k
 
 
 # ── character-model (v1: style-signature + few-shot from the real corpus) ──
@@ -122,7 +120,7 @@ class Character:
 # roles = the SEAT/function (voice-fidelity ≠ role-fidelity — model the seat too, per
 # The maintainer's 2026-06-28 correction). The triangle's three seats:
 _ROLES = {
-    "operator":   "router / decider — the artist-architect who sets direction and pushes for depth",
+    OP.SPEAKER: "router / decider — the artist-architect who sets direction and pushes for depth",
     "claude":  "architect / honest-floor — builds, and holds the truth-floor",
     "steward": "executor / verify / commit — the understanding + action layer",
 }
@@ -158,20 +156,20 @@ def build_characters(corpus: Path) -> dict:
     if corpus.suffix == ".jsonl":
         g = _load_jsonl_groups(corpus)
         out = {}
-        for sp in ("operator", "claude", "steward"):
+        for sp in (OP.SPEAKER, "claude", "steward"):
             ex = g.get(sp) or []
             if len(ex) < 6:
                 continue
             out[sp] = Character(sp.capitalize(), identity.signature(ex), ex, role=_ROLES.get(sp))
         return out
     text = corpus.read_text(encoding="utf-8", errors="ignore")
-    g = {"OPERATOR": [], "CLAUDE": []}
+    g = {OP.LABEL: [], "CLAUDE": []}
     for b in identity.blocks(text):
         lab = identity.label(b)
         if lab in g:
             g[lab].append(b)
     return {who: Character(who.capitalize(), identity.signature(g[who]), g[who])
-            for who in ("OPERATOR", "CLAUDE")}
+            for who in (OP.LABEL, "CLAUDE")}
 
 
 def _ask(client, system, convo, name, budget, model):
@@ -282,7 +280,7 @@ def main():
     print(f"GENERATOR v1 — {' ↔ '.join(c.name for c in chars.values())} · "
           f"model={args.model} · cap=${args.budget}\n")
     transcript = generate(chars, args.seed, args.turns, budget, args.model)
-    out = HERE / "generated_dialogue.jsonl"
+    out = paths.DATA / "generated_dialogue.jsonl"
     with out.open("w", encoding="utf-8") as f:
         for t in transcript:
             f.write(json.dumps(t, ensure_ascii=False) + "\n")

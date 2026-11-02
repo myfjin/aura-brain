@@ -21,9 +21,8 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE))
-import paths  # published settings module (see VENDORING.md)
-
+import paths  # noqa: E402 — every path the Brain touches lives in paths.py
+import operator_names as OP  # noqa: E402 — the operator's name as the data spells it
 import identity      # noqa: E402
 import brain         # noqa: E402
 import filter_tg     # noqa: E402
@@ -46,17 +45,19 @@ BASE_N = 60          # held-out real turns to measure the real baseline
 
 def operator_claude_turns() -> dict:
     text = PERSONA_TXT.read_text(errors="ignore")
-    g = {"Operator": [], "Claude": []}
+    g = {OP.CHARACTER: [], "Claude": []}
     for b in identity.blocks(text):
         lab = identity.label(b)
-        if lab == "OPERATOR":
-            g["Operator"].append(b)
+        if lab == OP.LABEL:
+            g[OP.CHARACTER].append(b)
         elif lab == "CLAUDE":
             g["Claude"].append(b)
     return g
 
 
 def _tg_turns(sender: str) -> list:
+    if TG_EXPORT is None:
+        raise RuntimeError("the Telegram export was retired on 2026-11-02 (maintainer's decision): it is deleted, and a revived persona experiment reads the shared conversation record instead")
     d = json.load(open(TG_EXPORT, encoding="utf-8"))
     out = []
     for m in d.get("messages", []):
@@ -86,7 +87,7 @@ def operator_corpus() -> list:
     his telegram voice, unioned + deduped. One canonical corpus so the persona is TRAINED and
     MEASURED on the same whole-of-operator (fixes the train/measure mismatch by union, not choice)."""
     seen, out = set(), []
-    for t in operator_claude_turns()["Operator"] + operator_turns():
+    for t in operator_claude_turns()[OP.CHARACTER] + operator_turns():
         k = t.strip()[:120]
         if k and k not in seen:
             seen.add(k); out.append(t)
@@ -95,7 +96,7 @@ def operator_corpus() -> list:
 
 def claude_turns() -> list:              # MY real turns — clean, role-labeled, full range
     out = []
-    for f in glob.glob(str(paths.LAB_ROOT / ".claude/projects/**/*.jsonl"), recursive=True):
+    for f in glob.glob(str(paths.need("CLAUDE_PROJECTS") / "**/*.jsonl"), recursive=True):
         for line in open(f, encoding="utf-8", errors="ignore"):
             try:
                 o = json.loads(line)
@@ -126,7 +127,7 @@ def voice_score(text: str, R):
 # ── move-libraries (per character that has one) — the SUBSTANCE / novelty-safe axis ──
 _MOVE_LIB = {
     "Steward": (MOVE_SPACES / "steward_moves.npy", MOVE_SPACES / "steward_moves.json"),
-    "Operator": (MOVE_SPACES / "operator_moves.npy", MOVE_SPACES / "operator_moves.json"),
+    OP.CHARACTER: (MOVE_SPACES / f"{OP.MOVES_STEM}.npy", MOVE_SPACES / f"{OP.MOVES_STEM}.json"),
     "Claude": (MOVE_SPACES / "claude_moves.npy", MOVE_SPACES / "claude_moves.json"),
 }
 
@@ -183,7 +184,7 @@ def main():
     import numpy as np
     chars = {}
     g = operator_claude_turns()
-    chars["Operator"] = operator_turns()        # telegram (labeled, plentiful) — fixes the 0.0 baseline
+    chars[OP.CHARACTER] = operator_turns()        # telegram (labeled, plentiful) — fixes the 0.0 baseline
     chars["Claude"] = g["Claude"]         # transcript heuristic — only Claude source we have
     chars["Steward"] = steward_turns()
 
@@ -214,7 +215,7 @@ def main():
         print(f"  {name:8} · move-lib {len(M)} families · REAL move baseline = {move_libs[name][2]:.3f}")
 
     for fname in ("generated_claude_steward.jsonl", "generated_dialogue.jsonl"):
-        p = HERE / fname
+        p = paths.DATA / fname
         if not p.exists():
             continue
         print(f"\n=== {fname} ===")

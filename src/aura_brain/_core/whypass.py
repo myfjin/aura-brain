@@ -35,10 +35,6 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE))
-import paths  # published settings module (see VENDORING.md)
-
-sys.path.insert(0, str(paths.PCE_DIR))
 from rails import detect_unverified_claim  # noqa: E402  (A6 — checked-or-claimed)
 
 # A4 — status > function: protecting how it looks over doing the true thing.

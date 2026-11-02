@@ -27,12 +27,10 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE))
-import paths  # published settings module (see VENDORING.md)
-
+import paths  # noqa: E402 — every path the Brain touches lives in paths.py
 MOVES = paths.PATTERNS_LIBRARY
-CACHE = HERE / "advice_domains.npz"
-LABELS = HERE / "advice_domains.json"
+CACHE = paths.DATA / "advice_domains.npz"
+LABELS = paths.DATA / "advice_domains.json"
 DEFAULT_K = 12
 SEED = 0
 

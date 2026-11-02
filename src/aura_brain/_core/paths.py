@@ -43,6 +43,19 @@ CONCEPT_LIBRARY_JSON: Path = _env_path(
 )
 OUTCOMES_LEDGER: Path = _env_path("OUTCOMES_LEDGER", BRAIN_HOME / "outcomes.jsonl")
 LOGIC_REGISTRY: Path = _env_path("AURA_LOGIC_REGISTRY", BRAIN_HOME / "logic_registry.jsonl")
+# The registry with each pattern re-checked against its oracles. The lanes read it only
+# while it is at least as new as LOGIC_REGISTRY and covers all its ids; otherwise they
+# read LOGIC_REGISTRY with nothing marked oracle-backed (logic_lane.rechecked_rows).
+LOGIC_REGISTRY_CANONICAL: Path = _env_path(
+    "AURA_LOGIC_REGISTRY_CANONICAL", BRAIN_HOME / "logic_registry_canonical.jsonl"
+)
+
+# ── the engine's own derived files ──────────────────────────────────────────
+DATA: Path = _env_path("AURA_BRAIN_DATA", BRAIN_HOME)
+REASONING_PATTERNS: Path = DATA / "reasoning_patterns.jsonl"
+GRAPH: Path = DATA / "graph.json"
+MATH_MISSES: Path = DATA / "math_misses.jsonl"
+CLEAN_DIALOGUE: Path = DATA / "clean_dialogue.jsonl"
 
 # ── streams / records the lanes read ────────────────────────────────────────
 MOVE_FIRES: Path = _env_path("AURA_MOVE_FIRES", BRAIN_HOME / "move-fires.jsonl")
@@ -52,6 +65,15 @@ REVIEW_VERDICTS: tuple[Path, ...] = (
     _env_path("AURA_REVIEW_VERDICTS_B", BRAIN_HOME / "streams" / "review-verdicts.jsonl"),
 )
 TRIALOGUE: Path = _env_path("AURA_TRIALOGUE", BRAIN_HOME / "trialogue.jsonl")
+# The root the artifact floor searches when a claim names a file, and the per-agent streams.
+AI_LAB: Path = _env_path("AURA_AI_LAB", BRAIN_HOME)
+STREAMS: Path = _env_path("AURA_STREAMS", BRAIN_HOME / "streams")
+VERDICTS_CLAUDE: Path = _env_path(
+    "AURA_VERDICTS_CLAUDE", STREAMS / "claude" / "review-verdicts.jsonl"
+)
+VERDICTS_STEWARD: Path = _env_path(
+    "AURA_VERDICTS_STEWARD", STREAMS / "steward" / "review-verdicts.jsonl"
+)
 
 # ── consult-lane registries (code you harvested, one dir per sphere) ────────
 PATTERNS_DS: Path = _env_path("AURA_PATTERNS_DS", BRAIN_HOME / "patterns_ds" / "harvested")
@@ -67,8 +89,36 @@ LAB_ROOT: Path = _env_path("LAB_ROOT", BRAIN_HOME)
 
 # ── offline corpora (the gate/generator path only — never the advice loop) ───
 PERSONA_TXT: Path = _env_path("AURA_PERSONA_TXT", BRAIN_HOME / "persona.txt")
-TG_EXPORT: Path = _env_path("AURA_TG_EXPORT", BRAIN_HOME / "tgexport" / "result.json")
+PERSONA_CORPUS: Path = _env_path("AURA_PERSONA_CORPUS", BRAIN_HOME / "persona_corpus.jsonl")
+# Retired: the persona readers raise instead of reading a chat export (persona work, if
+# revived, reads the trialogue). None, so a reader can never fall back to a default path.
+TG_EXPORT: Path | None = None
+TG_RAW_EXPORT: Path = _env_path("AURA_TG_RAW_EXPORT", BRAIN_HOME / "tgexport" / "raw.json")
 MOVE_SPACES: Path = _env_path("AURA_MOVE_SPACES", BRAIN_HOME / "move-spaces")
+
+# ── routes into another tool's store: no default; read them through need() ───
+_claude_projects = os.environ.get("AURA_CLAUDE_PROJECTS", "")
+CLAUDE_PROJECTS: Path | None = Path(_claude_projects).expanduser() if _claude_projects else None
+
+
+def need(attr: str) -> Path:
+    """The route ``attr``, or a RuntimeError naming it when it is not set."""
+    p = globals().get(attr)
+    if not isinstance(p, Path):
+        raise RuntimeError(f"paths: {attr} is not set; set it in the environment")
+    return p
+
+
+def secret(name: str) -> str:
+    """``$name`` from the environment, else from ``ENV_FILE`` if it exists, else ``""``."""
+    v = os.environ.get(name, "")
+    if v or not ENV_FILE.is_file():
+        return v
+    for line in ENV_FILE.read_text().splitlines():
+        line = line.strip().removeprefix("export ").strip()
+        if line.startswith(name + "="):
+            return line.split("=", 1)[1].strip().strip('"').strip("'")
+    return ""
 
 
 def describe() -> str:

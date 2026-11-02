@@ -28,10 +28,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE))
-import paths  # published settings module (see VENDORING.md)
-
-sys.path.insert(0, str(paths.PCE_DIR))
 import depth          # noqa: E402  (request-side classifier)
 import rails          # noqa: E402  (action-side R3; A6 via whypass)
 import whypass        # noqa: E402  (outbound floor: the why-pass = A4+A5+A6)

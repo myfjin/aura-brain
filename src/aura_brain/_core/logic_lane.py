@@ -35,16 +35,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE))
-import paths  # published settings module (see VENDORING.md)
-
+import paths  # noqa: E402 — every path the Brain touches lives in paths.py
 from constraint_filter import checkable_exprs  # noqa: E402  pure-stdlib, safe at import
-REGISTRY = paths.LOGIC_REGISTRY
+REGISTRY = paths.LOGIC_REGISTRY_CANONICAL   # the re-checked registry (O7)
 PATTERNS_DIR = paths.PATTERNS_DS
 R_PATTERNS_DIR = paths.PATTERNS_R
 SYS_PATTERNS_DIR = paths.PATTERNS_SYS
-CACHE = paths.BRAIN_HOME / "logic_keys_cache.npz"
-QUEUE = paths.BRAIN_HOME / "logic_misses.jsonl"        # sovereign L4 defer log (same schema as ds)
+CACHE = paths.DATA / "logic_keys_cache.npz"
+QUEUE = paths.DATA / "logic_misses.jsonl"        # sovereign L4 defer log (same schema as ds)
 LANE = "logic"
 
 
@@ -53,11 +51,11 @@ LANE = "logic"
 # its OWN embedding cache and miss queue — pooling them would thrash the cache and cross
 # sovereign streams (PCE-0 citizenship). registry=None keeps the DS path byte-identical.
 def _cache_for(registry) -> Path:
-    return CACHE if registry is None else HERE / f"logic_keys_cache_{Path(registry).stem}.npz"
+    return CACHE if registry is None else paths.DATA / f"logic_keys_cache_{Path(registry).stem}.npz"
 
 
 def _queue_for(registry) -> Path:
-    return QUEUE if registry is None else HERE / f"{Path(registry).stem}_misses.jsonl"
+    return QUEUE if registry is None else paths.DATA / f"{Path(registry).stem}_misses.jsonl"
 
 # Inherited default from ds_need's measured 0.30; VERIFIED against this lane's own
 # positives/negatives in selftest (the belief-sentence surface scores differently than
@@ -86,10 +84,38 @@ class LogicNeed:
 
 
 def _axioms(registry=None) -> list[dict]:
-    reg = REGISTRY if registry is None else Path(registry)
+    """registry=None: the DS registry under the O7 rule (rechecked_rows). An explicit registry is read as
+    given, so its is_axiom is whatever that file says: from an extractor it means "has a constraint", not
+    "oracle-backed" (6E, batch 8, A-2)."""
+    if registry is None:
+        return rechecked_rows()
+    reg = Path(registry)
     if not reg.exists():
         return []
     return [json.loads(l) for l in reg.read_text().splitlines() if l.strip()]
+
+
+def rechecked_rows() -> list[dict]:
+    """The DS registry as the lanes see it (KNOWN-DEBT O7). honest_pass re-checks the extracted registry
+    (paths.LOGIC_REGISTRY) against the oracles and writes REGISTRY. Where REGISTRY is missing or older than
+    the extracted file (a host that does not run honest_pass, a rebuild it has not caught up with), the
+    extracted file is read and NO row is claimed oracle-backed: an old re-check would vouch for rows it
+    never saw, and the extracted file's own is_axiom only says a constraint exists. A newer re-check that
+    lacks some of the extracted rows (empty, partial, restored with its mtime) is not fresh either: reading
+    it would drop those rows from every lane without a word (6E, batch 8, A-1)."""
+    load = lambda p: [json.loads(l) for l in p.read_text().splitlines() if l.strip()] if p.exists() else []
+    src = paths.LOGIC_REGISTRY
+    fresh = REGISTRY.exists() and (not src.exists() or REGISTRY.stat().st_mtime >= src.stat().st_mtime)
+    rows = load(REGISTRY) if fresh else []
+    if fresh and src.exists():
+        fresh = bool(rows) and {r["id"] for r in load(src)} <= {r["id"] for r in rows}
+    if not fresh:
+        rows = load(src)
+        for r in rows:
+            r["is_axiom"] = False
+            r["basis"] = "not-rechecked"
+            r["oracle"] = {"backed": False, "kinds": [], "tier": "candidate", "rechecked": False}
+    return rows
 
 
 def _keys(rows: list[dict]) -> list[tuple[str, str]]:
@@ -152,8 +178,11 @@ def logic_need(situation: str, defer_log: bool = True, registry=None) -> LogicNe
                        else f"cargo/rustc {lib}" if src.endswith(".rs")
                        else f"python3 {lib}")
         else:
-            witness = (f"Rscript {R_PATTERNS_DIR / (top_name + '.R')}" if sphere == "R"
-                       else f"python3 {SYS_PATTERNS_DIR / (top_name + '.py')}" if sphere == "SYS"
+            # A row with no recorded src (none for R or SYS today): find it in the library's category folders.
+            witness = (f"Rscript {next(R_PATTERNS_DIR.rglob(top_name + '.R'), R_PATTERNS_DIR / (top_name + '.R'))}"
+                       if sphere == "R"
+                       else f"python3 {next(SYS_PATTERNS_DIR.rglob(top_name + '.py'), SYS_PATTERNS_DIR / (top_name + '.py'))}"
+                       if sphere == "SYS"
                        else f"python3 {PATTERNS_DIR / (top_name + '.py')}")
         return LogicNeed(
             fired=True, axiom_id=top_name, confidence=top_score,
@@ -199,7 +228,7 @@ def selftest() -> int:
         "write the LinkedIn post for the folder-nature launch",
         "how are you feeling today brother",
     ]
-    if not REGISTRY.exists():
+    if not rechecked_rows():
         print("✗ FAIL  logic_registry.jsonl missing — run logic_extract.py build first")
         return 1
 

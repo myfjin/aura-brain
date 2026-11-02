@@ -26,9 +26,6 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-import paths  # published settings module (see VENDORING.md)
-
 try:  # the published tree ships without brain.py — it opens the private dialogue corpus.
     import brain  # noqa: E402
 except ImportError:  # fail OPEN and loud (CONTRIBUTING: "fail open with a loud WARN")
@@ -36,6 +33,7 @@ except ImportError:  # fail OPEN and loud (CONTRIBUTING: "fail open with a loud 
     print("[recognition] brain.py unavailable — dialogue recall off (fail-open)", file=sys.stderr)
 
 HERE = Path(__file__).resolve().parent
+import paths  # noqa: E402 — every path the Brain touches lives in paths.py
 PATTERNS = paths.PATTERNS_LIBRARY     # merged reasoning MOVES (primary)
 LIB_VEC = paths.CONCEPT_LIBRARY_NPY          # coarse concepts (fallback)
 LIB_META = paths.CONCEPT_LIBRARY_JSON
@@ -89,7 +87,7 @@ def _move_keys(p: dict, con) -> list:
     return [k for k in keys if k.strip()]
 
 
-_KEYS_CACHE = paths.BRAIN_HOME / "keys_cache.npz"
+_KEYS_CACHE = paths.DATA / "keys_cache.npz"
 
 
 def _keys_matrix(pats):
@@ -105,7 +103,7 @@ def _keys_matrix(pats):
         d = np.load(_KEYS_CACHE, allow_pickle=False)
         if str(d["sig"]) == sig and d["K"].shape[0] == d["owner"].shape[0]:
             return d["K"], d["owner"]
-    con = sqlite3.connect(f"file:{brain.STATE_DB}?mode=ro", uri=True)
+    con = sqlite3.connect(f"file:{paths.need('STATE_DB')}?mode=ro", uri=True)
     all_keys, owner = [], []
     for pi, p in enumerate(pats):
         for k in _move_keys(p, con):
@@ -163,7 +161,7 @@ def _fire(text: str, top: int = 3):
         sims[pi] = max(sims[pi], float(key_sims[idx]))
     order = np.argsort(-sims)
     fired = [int(i) for i in order if sims[i] >= FIRE_THRESHOLD][:top]
-    graph = json.loads((HERE / "graph.json").read_text()) if (HERE / "graph.json").exists() else {}
+    graph = json.loads(paths.GRAPH.read_text()) if paths.GRAPH.exists() else {}
     return {"pats": pats, "sims": sims, "order": order, "fired": fired, "graph": graph, "v": v}
 
 

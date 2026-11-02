@@ -8,7 +8,7 @@
 
 A weekly rollup of the honesty-floor callsites had produced a headline number: **57% of fires were fail-opening.** The number was startling — high enough that it implied the floor was under-catching by a large margin, and it was in the running to reshape what the next month of work would look like. It had been circulating internally for several days and had already begun to appear in cross-references from other briefs.
 
-The rollup came from 6E, who owns `BRAIN_TASKS.md` and the calibration paths. It was reported as a measurement, not a claim.
+The rollup came from 6E, who owns the Brain's task list and the calibration paths. It was reported as a measurement, not a claim.
 
 ## What we found
 

@@ -19,9 +19,10 @@ import statistics
 import sys
 from collections import Counter
 from pathlib import Path
-import paths  # published settings module (see VENDORING.md)
+import paths  # noqa: E402 — every path the Brain touches lives in paths.py
+import operator_names as OP  # noqa: E402 — the operator's name as the data spells it
 
-F = Path(sys.argv[1]) if len(sys.argv) > 1 else paths.BRAIN_HOME / "persona.txt"
+F = Path(sys.argv[1]) if len(sys.argv) > 1 else paths.PERSONA_TXT
 
 # UI action-stubs / tool traces to drop (not prose)
 _NOISE = re.compile(
@@ -79,7 +80,7 @@ def label(b: str) -> str:
     if c - i >= 2:
         return "CLAUDE"
     if i - c >= 2:
-        return "OPERATOR"
+        return OP.LABEL
     return "?"
 
 
@@ -108,13 +109,13 @@ def signature(texts: list) -> dict:
 def main():
     text = F.read_text(encoding="utf-8", errors="ignore")
     bs = blocks(text)
-    g = {"CLAUDE": [], "OPERATOR": [], "?": []}
+    g = {"CLAUDE": [], OP.LABEL: [], "?": []}
     for b in bs:
         g[label(b)].append(b)
     print(f"file: {F.name}  ·  {len(bs)} blocks  ·  "
-          f"OPERATOR {len(g['OPERATOR'])} / CLAUDE {len(g['CLAUDE'])} / ambiguous {len(g['?'])}\n")
+          f"{OP.LABEL} {len(g[OP.LABEL])} / CLAUDE {len(g['CLAUDE'])} / ambiguous {len(g['?'])}\n")
     sigs = {}
-    for who in ("OPERATOR", "CLAUDE"):
+    for who in (OP.LABEL, "CLAUDE"):
         sg = signature(g[who]); sigs[who] = sg
         print(f"=== {who} identity signature ({sg['blocks']} blocks) ===")
         for k, v in sg.items():
@@ -127,8 +128,8 @@ def main():
     print("=== what separates the two voices ===")
     for k in ("lowercase_start", "markdown_rate", "emoji_per_blk", "ellipsis_per_blk",
               "q_per_1k", "excl_per_1k", "avg_len"):
-        i, c = sigs["OPERATOR"][k], sigs["CLAUDE"][k]
-        print(f"   {k:16}  OPERATOR {i:>7}   CLAUDE {c:>7}   Δ {round(abs(i - c), 2)}")
+        i, c = sigs[OP.LABEL][k], sigs["CLAUDE"][k]
+        print(f"   {k:16}  {OP.LABEL} {i:>7}   CLAUDE {c:>7}   Δ {round(abs(i - c), 2)}")
 
 
 if __name__ == "__main__":

@@ -28,9 +28,6 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-import paths  # published settings module (see VENDORING.md)
-
 from constraint_filter import checkable_exprs  # noqa: E402  pure-stdlib, safe at import
 import node       # noqa: E402
 import outcomes   # noqa: E402  the earned-confidence ledger (recognition + review tracks)

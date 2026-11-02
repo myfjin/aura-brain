@@ -38,7 +38,7 @@ surviving = sorted({p.name for p in candidates if p.score >= threshold})
 
 ## The rules that came out
 
-- **`PYTHONHASHSEED=0` in the test env is required for calibration paths.** Set in `pyproject.toml` under `[tool.pytest.ini_options].env`. Anything that materializes a set of hashable values into a list uses `sorted()`, or is written with the seed variability explicit in a property test.
+- **`PYTHONHASHSEED=0` in the test env is required for calibration paths.** Set on the pytest step of `.github/workflows/ci.yml` (`PYTHONHASHSEED: "0"`), not in `pyproject.toml`: pytest's `env` setting needs the pytest-env plugin, which is not a dependency. Anything that materializes a set of hashable values into a list uses `sorted()`, or is written with the seed variability explicit in a property test.
 - **Iteration order of any set or dict-of-set is not stable across processes.** If your code depends on that order, the code is wrong; there is no `PYTHONHASHSEED` you can pin in production that makes this okay.
 - **Make the checker fail once before you trust it.** The fixture was captured *from* the buggy path, so the test agreed with the bug. A test that has never been red has verified nothing.
 

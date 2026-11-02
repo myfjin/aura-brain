@@ -29,7 +29,7 @@ Option 1 would have closed a loop. Option 2 keeps a task open on the master list
 
 ## What we did
 
-We took Option 2. T5.1 stayed PENDING. The status line in `BRAIN_TASKS.md` reads exactly that: *pending, could not be proved on the data we had, reopens when N_test ≥ 60 fresh honest outcomes accumulate.* It has been open ever since.
+We took Option 2. T5.1 stayed PENDING. The status line in the Brain's task list (kept in the private repository) reads exactly that: *pending, could not be proved on the data we had, reopens when N_test ≥ 60 fresh honest outcomes accumulate.* It has been open ever since.
 
 ## Why this matters more than the answer would have
 
