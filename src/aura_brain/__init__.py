@@ -21,7 +21,7 @@ import sys as _sys
 from importlib import import_module
 from typing import Any
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 # The published core imports flat (`import outcomes`, `import paths`): the publisher
 # rewrites the private package imports into that form. Putting its directory on

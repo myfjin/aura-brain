@@ -38,7 +38,7 @@ ruff and mypy.
 
     python -c "import aura_brain; print(aura_brain.__version__)"
 
-You should see the version declared in `pyproject.toml` — currently `0.2.0`.
+You should see the version declared in `pyproject.toml` — currently `0.3.0`.
 
 ## Run the tests
 
