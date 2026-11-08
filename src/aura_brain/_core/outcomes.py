@@ -27,6 +27,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 import paths  # noqa: E402 — every path the Brain touches lives in paths.py
+import atomic  # noqa: E402 — files rewritten whole are swapped in
 LIB = paths.PATTERNS_LIBRARY
 LEDGER = paths.OUTCOMES_LEDGER
 
@@ -81,7 +82,8 @@ def _mark_stream_graded(draft_hash: str, held: bool) -> bool:
                     r["grade_held"] = bool(held)
                     hit = True
             if hit:
-                p.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows))
+                body = "".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows).encode("utf-8")
+                atomic.replace(p, lambda fh, body=body: fh.write(body))
                 return True
         except Exception:
             continue
@@ -166,9 +168,8 @@ def restamp() -> list:
     for p in lib:
         h, m = _tally(p, ledger)
         p["confidence"] = beta(h, m)
-    with LIB.open("w", encoding="utf-8") as f:
-        for p in lib:
-            f.write(json.dumps(p, ensure_ascii=False) + "\n")
+    body = "".join(json.dumps(p, ensure_ascii=False) + "\n" for p in lib).encode("utf-8")
+    atomic.replace(LIB, lambda fh: fh.write(body))
 
     # orphan check: MOVE outcomes (NOT the separate review: track) matching NO live
     # pattern by id-intersection or name. Rows already marked `orphaned` (audited,

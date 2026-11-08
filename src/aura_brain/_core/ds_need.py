@@ -30,6 +30,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 import paths  # noqa: E402 — every path the Brain touches lives in paths.py
+import atomic  # noqa: E402 — files rewritten whole are swapped in
 PATTERNS_DIR = paths.PATTERNS_DS
 # R patterns come from the signed library, nested by category (r/<category>/<name>.R).
 # The old PATTERNS_R (~/lab/patterns_r/harvested) was gone, and ds_need silently indexed
@@ -129,8 +130,8 @@ def _index():
     names = [n for n, _, _ in keys]
     spheres = [s for _, s, _ in keys]
     K = brain.embed([k for _, _, k in keys])
-    np.savez(CACHE, names=np.array(names), spheres=np.array(spheres), K=K,
-             digest=np.array(digest))
+    atomic.replace(CACHE, lambda fh: np.savez(fh, names=np.array(names), spheres=np.array(spheres), K=K,
+                                              digest=np.array(digest)))
     return names, spheres, K
 
 
