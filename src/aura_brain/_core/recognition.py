@@ -34,6 +34,7 @@ except ImportError:  # fail OPEN and loud (CONTRIBUTING: "fail open with a loud 
 
 HERE = Path(__file__).resolve().parent
 import paths  # noqa: E402 — every path the Brain touches lives in paths.py
+import atomic  # noqa: E402 — files rewritten whole are swapped in
 PATTERNS = paths.PATTERNS_LIBRARY     # merged reasoning MOVES (primary)
 LIB_VEC = paths.CONCEPT_LIBRARY_NPY          # coarse concepts (fallback)
 LIB_META = paths.CONCEPT_LIBRARY_JSON
@@ -112,7 +113,7 @@ def _keys_matrix(pats):
     if not all_keys:
         return None, None
     K = brain.embed(all_keys)
-    np.savez(_KEYS_CACHE, K=K, owner=np.array(owner), sig=np.array(sig))
+    atomic.replace(_KEYS_CACHE, lambda fh: np.savez(fh, K=K, owner=np.array(owner), sig=np.array(sig)))
     return K, np.array(owner)
 
 
